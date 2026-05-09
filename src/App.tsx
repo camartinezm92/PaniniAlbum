@@ -196,7 +196,10 @@ export default function App() {
   const filteredTeams = useMemo(() => {
     let result = [...TEAMS];
     if (searchQuery) {
-      result = result.filter(t => t.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      result = result.filter(t => 
+        t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        t.id.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
     if (selectedGroup && viewMode === 'groups') {
       result = result.filter(t => t.group === selectedGroup);
@@ -616,7 +619,7 @@ export default function App() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input 
                     type="text" 
-                    placeholder="Buscar equipo..." 
+                    placeholder="Buscar por nombre o abreviado (ej: MEX)..." 
                     value={searchQuery} 
                     onChange={(e) => setSearchQuery(e.target.value)} 
                     className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all text-sm shadow-sm" 
@@ -964,7 +967,7 @@ export default function App() {
                         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                            {missingStickers.map(item => (
                              <div key={item.id} className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm">
-                                <p className="text-xs font-black text-gray-500 dark:text-gray-300 uppercase mb-3 tracking-widest">{item.name}</p>
+                                <p className="text-xs font-black text-gray-500 dark:text-gray-300 uppercase mb-3 tracking-widest">{item.name} <span className="opacity-50 font-bold ml-1">({item.id})</span></p>
                                 <div className="flex flex-wrap gap-2">
                                    {item.stickers.map(num => (
                                      <button 
@@ -999,7 +1002,7 @@ export default function App() {
                         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                            {repeatedStickers.length > 0 ? repeatedStickers.map(item => (
                              <div key={item.id} className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm">
-                                <p className="text-xs font-black text-gray-500 dark:text-gray-300 uppercase mb-3 tracking-widest">{item.name}</p>
+                                <p className="text-xs font-black text-gray-500 dark:text-gray-300 uppercase mb-3 tracking-widest">{item.name} <span className="opacity-50 font-bold ml-1">({item.id})</span></p>
                                 <div className="flex flex-wrap gap-2">
                                    {item.stickers.map(s => (
                                      <button 
@@ -1055,7 +1058,9 @@ function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStick
       <div className="flex items-center gap-4 mb-4">
         <span className="text-4xl">{team.flag}</span>
         <div>
-          <h3 className="font-black text-lg text-gray-900 dark:text-white uppercase leading-none mb-1">{team.name}</h3>
+          <h3 className="font-black text-lg text-gray-900 dark:text-white uppercase leading-none mb-1">
+            {team.name} <span className="text-gray-400 font-bold ml-1 text-sm">({team.id})</span>
+          </h3>
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Grupo {team.group} • {ownedCount}/20</p>
         </div>
       </div>
@@ -1102,7 +1107,9 @@ function TeamDetail({ teamId, onClose, compareData }: {
           <div className="flex items-center gap-5">
              <div className="text-5xl drop-shadow-lg">{team.flag || '⚽'}</div>
              <div>
-               <h3 className="text-3xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">{team.name}</h3>
+               <h3 className="text-3xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">
+                 {team.name} <span className="text-gray-400 font-bold ml-2">({teamId})</span>
+               </h3>
                <div className="flex items-center gap-2">
                  <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase">{count} fichas totales</p>
                  <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-black">TIP: Mantén presionado para quitar</span>
