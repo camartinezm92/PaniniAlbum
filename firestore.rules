@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 0.1 Primitives & Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // 1. Validation Blueprints
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'photoURL'])
+          && data.keys().size() == 4
+          && data.uid == request.auth.uid
+          && data.email == request.auth.token.email
+          && data.displayName is string && data.displayName.size() <= 100
+          && (data.photoURL == null || (data.photoURL is string && data.photoURL.size() <= 500));
+    }
+
+    function isValidAlbum(data) {
+      return data.keys().hasAll(['userId', 'stickers', 'updatedAt', 'shortId'])
+          && data.keys().size() >= 4 && data.keys().size() <= 5
+          && data.userId == request.auth.uid
+          && data.shortId is string && data.shortId.size() == 8
+          && data.stickers is map
+          && data.stickers.size() <= 1000
+          && (data.friends == null || data.friends is map)
+          && (data.updatedAt == request.time || data.updatedAt == null);
+    }
+
+    function isValidProposal(data) {
+      return data.keys().hasAll(['fromId', 'fromUid', 'toId', 'toUid', 'give', 'get', 'status', 'createdAt'])
+          && data.keys().size() == 8
+          && data.fromUid == request.auth.uid
+          && data.status == 'pending'
+          && data.give is list && data.get is list
+          && data.createdAt == request.time;
+    }
+
+    // 2. Collection Rules
+    
+    // User Profiles
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) 
+                     && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'email']);
+      allow delete: if false;
+    }
+
+    // Trade Proposals
+    match /proposals/{proposalId} {
+      allow read: if isSignedIn() && (resource.data.fromUid == request.auth.uid || resource.data.toUid == request.auth.uid);
+      allow list: if isSignedIn() && (query.limit <= 20); // Client must filter by UID
+      
+      allow create: if isSignedIn() && isValidProposal(incoming());
+      
+      allow update: if isSignedIn() 
+                     && (existing().fromUid == request.auth.uid || existing().toUid == request.auth.uid)
+                     && incoming().diff(existing()).affectedKeys().hasOnly(['status'])
+                     && incoming().status in ['accepted', 'rejected', 'cancelled', 'completed'];
+                     
+      allow delete: if false;
+    }
+
+    // Sticker Albums
+    match /albums/{userId} {
+      // Allow single doc read and list queries (for shortId search)
+      allow read: if isSignedIn();
+      
+      // Allow searching by shortId
+      allow list: if isSignedIn() && request.query.limit <= 10;
+      
+      allow create: if isOwner(userId) && isValidAlbum(incoming());
+      
+      allow update: if isOwner(userId) && isValidAlbum(incoming())
+                     && (
+                       // Action: Update Stickers
+                       incoming().diff(existing()).affectedKeys().hasOnly(['stickers', 'updatedAt']) ||
+                       // Action: Friends/Recent list
+                       incoming().diff(existing()).affectedKeys().hasOnly(['friends', 'updatedAt']) ||
+                       // Action: Initialize shortId
+                       incoming().diff(existing()).affectedKeys().hasOnly(['shortId', 'updatedAt'])
+                     );
+      
+      allow delete: if false;
+    }
+  }
+}

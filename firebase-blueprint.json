@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "StickerProgress": {
+      "title": "Sticker Progress",
+      "description": "Stores the count of each sticker owned by the user",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "shortId": {
+          "type": "string",
+          "description": "Short human-readable ID for album sharing (8 chars)"
+        },
+        "stickers": {
+          "type": "object",
+          "description": "Map of sticker ID (e.g., 'COL-1', 'FWC-5', 'CC-2') to count (integer)"
+        },
+        "friends": {
+          "type": "object",
+          "description": "Map of shortId to friend info (nickname, lastInteraction)"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "stickers",
+        "shortId"
+      ]
+    },
+    "TradeProposal": {
+      "title": "Trade Proposal",
+      "description": "A pending trade request between two users",
+      "type": "object",
+      "properties": {
+        "fromId": { "type": "string", "description": "shortId of sender" },
+        "fromUid": { "type": "string", "description": "UID of sender" },
+        "toId": { "type": "string", "description": "shortId of recipient" },
+        "toUid": { "type": "string", "description": "UID of recipient" },
+        "give": { "type": "array", "items": { "type": "string" } },
+        "get": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["pending", "accepted", "rejected", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fromId", "fromUid", "toId", "toUid", "give", "get", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/albums/{userId}": {
+      "schema": "StickerProgress",
+      "description": "Sticker tracking data for a specific user"
+    },
+    "/proposals/{proposalId}": {
+      "schema": "TradeProposal",
+      "description": "Trade requests between users"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Public profile info"
+    }
+  }
+}
