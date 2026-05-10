@@ -169,7 +169,7 @@ export default function App() {
   }, [stickers, compareData]);
 
   useEffect(() => {
-    if (compareId && user && compareId !== user.uid) {
+    if (compareId && user && compareId !== user.uid && (!compareData || compareData.userId !== compareId)) {
       const fetchCompare = async () => {
         const albumRef = doc(db, 'albums', compareId);
         const userRef = doc(db, 'users', compareId);
@@ -212,7 +212,7 @@ export default function App() {
 
   const stats = useMemo(() => {
     const totalTeamsStickers = TEAMS.length * 20;
-    const totalSpecials = SPECIALS.FWC.count + SPECIALS.CC.count;
+    const totalSpecials = Object.values(SPECIALS).reduce((acc, curr) => acc + curr.count, 0);
     const totalTotal = totalTeamsStickers + totalSpecials;
     
     let owned = 0;
@@ -716,7 +716,14 @@ export default function App() {
                   const owned = Object.keys(stickers).filter(id => id.startsWith(key)).filter(id => stickers[id]>0).length;
                   return <button key={key} onClick={()=>setSelectedTeam(key)} className="bg-white dark:bg-gray-900 p-6 rounded-[28px] border border-gray-100 dark:border-white/5 shadow-lg text-left hover:border-blue-500 transition-all group">
                      <div className="flex items-center justify-between mb-4">
-                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black shadow-inner", key==='CC' ? 'bg-red-500 text-white' : 'bg-blue-600 text-white')}>{key}</div>
+                        <div className={cn(
+                          "w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black shadow-inner", 
+                          key === '00' ? 'bg-amber-500 text-white shadow-amber-500/20' : 
+                          key === 'CC' ? 'bg-red-500 text-white' : 
+                          'bg-blue-600 text-white'
+                        )}>
+                          {key}
+                        </div>
                         <p className="text-2xl font-black text-gray-900 dark:text-white">{owned}<span className="text-sm font-medium text-gray-400">/{info.count}</span></p>
                      </div>
                      <p className="font-black text-lg text-gray-900 dark:text-white mb-4 uppercase">{info.name}</p>
@@ -1129,10 +1136,19 @@ function TeamDetail({ teamId, onClose, compareData }: {
         <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3">
           {Array.from({ length: count }, (_, i) => i + 1).map(num => {
             const sId = `${teamId}-${num}`; const my = stickers[sId] || 0; const their = compareData?.stickers[sId] || 0;
+            const isSpecial = (teamId === '00' || teamId === 'FWC' || teamId === 'CC') || (num === 1 || num === 13);
             let ring = ""; if (compareData) { if (my === 0 && their > 1) ring = "ring-2 ring-green-500 ring-offset-2 dark:ring-offset-gray-950"; if (their === 0 && my > 1) ring = "ring-2 ring-amber-500 ring-offset-2 dark:ring-offset-gray-950"; }
             return (
               <div key={sId} className="relative">
-                 <StickerButton id={sId} label={(teamId === 'FWC' || teamId === 'CC') ? `${teamId}${num}` : `${num}`} count={my} onClick={() => updateSticker(sId, 1)} onLongPress={() => updateSticker(sId, -1)} className={ring} />
+                 <StickerButton 
+                   id={sId} 
+                   label={teamId === '00' ? '00' : (teamId === 'FWC' || teamId === 'CC') ? `${teamId}${num}` : `${num}`} 
+                   count={my} 
+                   onClick={() => updateSticker(sId, 1)} 
+                   onLongPress={() => updateSticker(sId, -1)} 
+                   className={ring}
+                   isSpecial={isSpecial}
+                 />
                  {compareData && their > 0 && <div className="absolute -top-1 -left-1 flex h-4 w-4 rounded-full bg-green-500 border-2 border-white dark:border-gray-950 z-20" />}
               </div>
             );

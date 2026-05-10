@@ -1,12 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { signInWithGoogle, logout } from '../firebase';
-import { LogIn, LogOut, Sun, Moon, Trophy } from 'lucide-react';
+import { LogIn, LogOut, Sun, Moon, Trophy, WifiOff } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { user } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-white/80 dark:bg-black/80 backdrop-blur-md border-gray-200 dark:border-gray-800">
@@ -16,6 +30,12 @@ export const Navbar: React.FC = () => {
           <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             PANINI 2026
           </span>
+          {isOffline && (
+            <div className="flex items-center gap-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest ml-2">
+              <WifiOff className="w-3 h-3" />
+              <span>Desconectado</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-3">

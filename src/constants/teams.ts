@@ -63,7 +63,8 @@ export const TEAMS: Team[] = [
   { id: 'PAN', name: 'Panamá', flag: '🇵🇦', group: 'L' },
 ];
 
-export const SPECIALS = {
+export const SPECIALS: Record<string, { name: string; count: number }> = {
+  '00': { name: 'Especial 00', count: 1 },
   FWC: { name: 'FIFA World Cup', count: 19 },
   CC: { name: 'Coca-Cola', count: 14 }
 };

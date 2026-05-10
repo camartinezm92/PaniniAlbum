@@ -9,6 +9,7 @@ interface StickerButtonProps {
   onLongPress: () => void;
   label?: string;
   className?: string;
+  isSpecial?: boolean;
 }
 
 export const StickerButton: React.FC<StickerButtonProps> = ({ 
@@ -17,7 +18,8 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
   onClick, 
   onLongPress,
   label,
-  className
+  className,
+  isSpecial
 }) => {
   const [isPressing, setIsPressing] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -74,8 +76,16 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
       className={cn(
         "relative flex flex-col items-center justify-center h-14 w-full rounded-2xl border-2 transition-all duration-200 select-none touch-none",
         count > 0 
-          ? "bg-blue-600 border-blue-600 text-white font-black shadow-lg shadow-blue-500/20" 
-          : "bg-white dark:bg-gray-800 border-gray-100 dark:border-white/5 text-gray-400 hover:border-blue-500/30",
+          ? cn(
+              "text-white font-black shadow-lg shadow-blue-500/20",
+              isSpecial 
+                ? "bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 border-amber-300 shadow-amber-500/20" 
+                : "bg-blue-600 border-blue-600"
+            )
+          : cn(
+              "bg-white dark:bg-gray-800 border-gray-100 dark:border-white/5 text-gray-400 hover:border-blue-500/30",
+              isSpecial && "border-amber-500/30 bg-amber-50/5 dark:bg-amber-900/10"
+            ),
         isPressing && "scale-95",
         className
       )}
