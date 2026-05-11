@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { TEAMS, SPECIALS } from './constants/teams';
+import { PLAYER_NAMES } from './constants/playerNames';
+import { COUNTRY_COLORS, getFlagUrl } from './constants/countryData';
 import { useAlbum } from './contexts/AlbumContext';
 import { useAuth } from './contexts/AuthContext';
 import { Navbar } from './components/Navbar';
@@ -86,8 +88,24 @@ export default function App() {
       if (!map[team.group]) map[team.group] = [];
       map[team.group].push(team);
     });
-    return Object.keys(map).sort().map(g => ({ id: g, teams: map[g] }));
-  }, []);
+    return Object.keys(map).sort().map(g => {
+      const gTeams = map[g];
+      let owned = 0;
+      const total = gTeams.length * 20;
+      gTeams.forEach(t => {
+        for(let i=1; i<=20; i++) {
+          if ((stickers[`${t.id}-${i}`] || 0) > 0) owned++;
+        }
+      });
+      return { 
+        id: g, 
+        teams: gTeams,
+        owned,
+        total,
+        percent: Math.round((owned / total) * 100)
+      };
+    });
+  }, [stickers]);
 
   const missingStickers = useMemo(() => {
     const missing: { id: string; name: string; stickers: number[] }[] = [];
@@ -382,6 +400,18 @@ export default function App() {
     alert('¡Propuesta copiada! Envíala por WhatsApp o chat a tu amigo.');
   };
 
+  const [expandedSummaryGroups, setExpandedSummaryGroups] = useState<Record<string, boolean>>({});
+  const [expandedGroupIds, setExpandedGroupIds] = useState<Record<string, boolean>>({});
+  const [quickView, setQuickView] = useState<'escudos' | 'equipos' | null>(null);
+
+  const toggleSummaryGroup = (id: string) => {
+    setExpandedSummaryGroups(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const toggleGroup = (id: string) => {
+    setExpandedGroupIds(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const copyMissingList = () => {
     let text = "MI ALBUM - FALTANTES:\n\n";
     missingStickers.forEach(team => {
@@ -625,16 +655,30 @@ export default function App() {
                     className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all text-sm shadow-sm" 
                   />
                 </div>
-                <button 
-                  onClick={() => setViewMode(v => v === 'groups' ? 'alphabetical' : 'groups')}
-                  className={cn(
-                    "p-2.5 rounded-2xl border transition-all",
-                    viewMode === 'alphabetical' ? "bg-blue-600 border-blue-600 text-white" : "bg-white dark:bg-white/5 border-gray-100 dark:border-white/5 text-gray-500"
-                  )}
-                  title="Cambiar vista"
-                >
-                  <List className="w-5 h-5" />
-                </button>
+                 <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl shadow-inner">
+                   <button 
+                     onClick={() => setViewMode('groups')}
+                     className={cn(
+                       "px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-1.5",
+                       viewMode === 'groups' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                     )}
+                     title="Vista por Grupos"
+                   >
+                     <LayoutGrid className="w-3.5 h-3.5" />
+                     <span className="hidden sm:inline">Grupos</span>
+                   </button>
+                   <button 
+                     onClick={() => setViewMode('alphabetical')}
+                     className={cn(
+                       "px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-1.5",
+                       viewMode === 'alphabetical' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                     )}
+                     title="Vista Alfabética"
+                   >
+                     <List className="w-3.5 h-3.5" />
+                     <span className="hidden sm:inline">A-Z</span>
+                   </button>
+                 </div>
               </div>
            </div>
 
@@ -658,11 +702,17 @@ export default function App() {
                       key={g.id}
                       onClick={() => setSelectedGroup(g.id)}
                       className={cn(
-                        "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
-                        selectedGroup === g.id ? "bg-blue-600 text-white" : "bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100"
+                        "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-2",
+                        selectedGroup === g.id ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "bg-white dark:bg-white/5 text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10"
                       )}
                     >
-                      Grupo {g.id}
+                      <span>Grupo {g.id}</span>
+                      <span className={cn(
+                        "px-1.5 py-0.5 rounded-md text-[8px]",
+                        selectedGroup === g.id ? "bg-white/20 text-white" : "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                      )}>
+                        {g.percent}%
+                      </span>
                     </button>
                   ))}
               </motion.div>
@@ -683,16 +733,56 @@ export default function App() {
                 {viewMode === 'groups' && !selectedGroup && !searchQuery ? (
                   groups.map(group => (
                     <div key={group.id} className="space-y-4">
-                      <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-sm shadow-lg shadow-blue-500/20">{group.id}</div>
-                        Grupo {group.id}
-                      </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {group.teams.map(team => {
-                          const owned = Array.from({length:20}, (_,i)=>i+1).filter(n => (stickers[`${team.id}-${n}`]||0)>0).length;
-                          return <TeamCard key={team.id} team={team} ownedCount={owned} onClick={()=>setSelectedTeam(team.id)} isComparing={isComparing} compareData={compareData} myStickers={stickers} />;
-                        })}
-                      </div>
+                      <button 
+                        onClick={() => toggleGroup(group.id)}
+                        className="w-full text-left flex items-center justify-between bg-white dark:bg-gray-900 p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm hover:border-blue-500/30 transition-all group overflow-hidden relative"
+                      >
+                        {/* Background Flags Grid */}
+                        <div className="absolute inset-0 grid grid-cols-4 opacity-40 dark:opacity-50 pointer-events-none blur-[1px]">
+                          {group.teams.map(t => (
+                            <img key={t.id} src={getFlagUrl(t.id)} alt="" className="w-full h-full object-fill" referrerPolicy="no-referrer" />
+                          ))}
+                        </div>
+
+                        <div className="flex items-center gap-4 relative z-10">
+                          <div className="flex -space-x-2 mr-2 bg-white/50 dark:bg-gray-800/50 p-1.5 rounded-2xl backdrop-blur-sm border border-white/20">
+                            {group.teams.map(t => (
+                              <img key={t.id} src={getFlagUrl(t.id)} alt={t.name} className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-sm" referrerPolicy="no-referrer" />
+                            ))}
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-black uppercase tracking-tighter text-gray-900 dark:text-white">Grupo {group.id}</h3>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{group.owned} / {group.total} fichas</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 relative z-10 bg-white/50 dark:bg-gray-800/50 p-2 rounded-2xl backdrop-blur-sm border border-white/20">
+                          <div className="text-right">
+                             <p className="text-sm font-black text-blue-600 dark:text-blue-400">{group.percent}%</p>
+                             <div className="h-1 w-16 bg-gray-100 dark:bg-white/5 rounded-full mt-1 overflow-hidden">
+                               <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600" />
+                             </div>
+                          </div>
+                          <ChevronRight className={cn("w-5 h-5 text-gray-400 transition-transform", expandedGroupIds[group.id] && "rotate-90")} />
+                        </div>
+                      </button>
+
+                      <AnimatePresence>
+                        {expandedGroupIds[group.id] && (
+                          <motion.div 
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
+                              {group.teams.map(team => {
+                                const owned = Array.from({length:20}, (_,i)=>i+1).filter(n => (stickers[`${team.id}-${n}`]||0)>0).length;
+                                return <TeamCard key={team.id} team={team} ownedCount={owned} onClick={()=>setSelectedTeam(team.id)} isComparing={isComparing} compareData={compareData} myStickers={stickers} />;
+                              })}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   ))
                 ) : (
@@ -955,7 +1045,68 @@ export default function App() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                      <div className="flex flex-wrap gap-3 mb-8">
+                        <button 
+                          onClick={() => setQuickView(quickView === 'escudos' ? null : 'escudos')}
+                          className={cn(
+                            "flex-1 min-w-[140px] px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 border-2",
+                            quickView === 'escudos'
+                              ? "bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/20"
+                              : "bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 text-gray-500 hover:border-amber-500/50"
+                          )}
+                        >
+                          <Trophy className="w-4 h-4" />
+                          Escudos
+                        </button>
+                        <button 
+                          onClick={() => setQuickView(quickView === 'equipos' ? null : 'equipos')}
+                          className={cn(
+                            "flex-1 min-w-[140px] px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 border-2",
+                            quickView === 'equipos'
+                              ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20"
+                              : "bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 text-gray-500 hover:border-blue-500/50"
+                          )}
+                        >
+                          <Users className="w-4 h-4" />
+                          Equipos
+                        </button>
+                      </div>
+
+                      {quickView && (
+                        <div className="mb-12 p-8 bg-gray-50 dark:bg-white/5 rounded-[40px] border border-gray-200 dark:border-white/5">
+                          <h3 className="text-2xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
+                            <div className={cn("w-2 h-8 rounded-full", quickView === 'escudos' ? "bg-amber-500" : "bg-blue-600")} />
+                            Vista Rápida: {quickView === 'escudos' ? 'Todos los Escudos' : 'Todos los Equipos'}
+                          </h3>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
+                            {TEAMS.map(team => {
+                              const num = quickView === 'escudos' ? 1 : 13;
+                              const sId = `${team.id}-${num}`;
+                              const count = stickers[sId] || 0;
+                              const isSpecial = true;
+                              const playerName = PLAYER_NAMES[team.id]?.[num];
+                              
+                              return (
+                                <div key={sId} className="space-y-1">
+                                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">{team.id}</div>
+                                  <StickerButton 
+                                    id={sId}
+                                    label={String(num)}
+                                    count={count}
+                                    onClick={() => updateSticker(sId, 1)}
+                                    onLongPress={() => updateSticker(sId, -1)}
+                                    isSpecial={isSpecial}
+                                    playerName={playerName}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      {/* Missing List */}
                      <div className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -971,23 +1122,61 @@ export default function App() {
                              Copiar Texto
                            </button>
                         </div>
-                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                           {missingStickers.map(item => (
-                             <div key={item.id} className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm">
-                                <p className="text-xs font-black text-gray-500 dark:text-gray-300 uppercase mb-3 tracking-widest">{item.name} <span className="opacity-50 font-bold ml-1">({item.id})</span></p>
-                                <div className="flex flex-wrap gap-2">
-                                   {item.stickers.map(num => (
-                                     <button 
-                                      key={num}
-                                      onClick={() => setSelectedTeam(item.id)}
-                                      className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-white/10 rounded-xl text-xs font-black text-gray-900 dark:text-white hover:bg-red-500/10 hover:text-red-500 transition-all active:scale-95"
+                        <div className="flex flex-wrap gap-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar content-start">
+                           {missingStickers.map(item => {
+                             const isExpanded = expandedSummaryGroups[`missing-${item.id}`];
+                             return (
+                               <div key={item.id} className={cn("transition-all duration-300", isExpanded ? "w-full" : "w-auto")}>
+                                 <button 
+                                   onClick={() => toggleSummaryGroup(`missing-${item.id}`)}
+                                   className={cn(
+                                     "px-4 h-10 rounded-full flex items-center gap-2 border transition-all font-black text-xs uppercase tracking-widest",
+                                     isExpanded 
+                                       ? "bg-red-500 border-red-500 text-white w-full" 
+                                       : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-red-500/50"
+                                   )}
+                                 >
+                                   <span>{item.id}</span>
+                                   {isExpanded && <span className="opacity-80 font-bold ml-1 flex-1 text-left line-clamp-1">{item.name}</span>}
+                                   <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px]", isExpanded ? "bg-white/20" : "bg-gray-100 dark:bg-white/5")}>
+                                     {item.stickers.length}
+                                   </div>
+                                 </button>
+                                 <AnimatePresence>
+                                   {isExpanded && (
+                                     <motion.div 
+                                       initial={{ height: 0, opacity: 0 }}
+                                       animate={{ height: 'auto', opacity: 1 }}
+                                       exit={{ height: 0, opacity: 0 }}
+                                       className="overflow-hidden"
                                      >
-                                       {num}
-                                     </button>
-                                   ))}
-                                </div>
-                             </div>
-                           ))}
+                                       <div className="p-4 mt-2 bg-gray-50 dark:bg-white/5 rounded-3xl border border-gray-200 dark:border-white/5">
+                                          <div className="flex flex-wrap gap-3">
+                                            {item.stickers.map(num => {
+                                              const playerName = PLAYER_NAMES[item.id]?.[num];
+                                              return (
+                                                <button 
+                                                 key={num}
+                                                 onClick={() => setSelectedTeam(item.id)}
+                                                 className="relative h-14 min-w-[60px] px-2 flex flex-col items-center justify-center bg-white dark:bg-gray-900 rounded-2xl font-black text-gray-900 dark:text-white shadow-sm border border-gray-100 dark:border-white/5 hover:border-red-500/50 transition-all active:scale-95"
+                                                >
+                                                  <span className={cn(playerName ? "text-[11px]" : "text-sm")}>{num}</span>
+                                                  {playerName && (
+                                                    <span className="text-[8px] leading-tight uppercase font-bold text-center opacity-70 truncate w-full mt-0.5">
+                                                      {playerName}
+                                                    </span>
+                                                  )}
+                                                </button>
+                                              );
+                                            })}
+                                          </div>
+                                       </div>
+                                     </motion.div>
+                                   )}
+                                 </AnimatePresence>
+                               </div>
+                             );
+                           })}
                         </div>
                      </div>
 
@@ -1006,25 +1195,63 @@ export default function App() {
                              Copiar Texto
                            </button>
                         </div>
-                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                           {repeatedStickers.length > 0 ? repeatedStickers.map(item => (
-                             <div key={item.id} className="bg-white dark:bg-gray-900 p-5 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm">
-                                <p className="text-xs font-black text-gray-500 dark:text-gray-300 uppercase mb-3 tracking-widest">{item.name} <span className="opacity-50 font-bold ml-1">({item.id})</span></p>
-                                <div className="flex flex-wrap gap-2">
-                                   {item.stickers.map(s => (
-                                     <button 
-                                      key={s.num}
-                                      onClick={() => setSelectedTeam(item.id)}
-                                      className="relative w-12 h-10 flex items-center justify-center bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl text-xs font-black border border-amber-500/30 hover:bg-amber-500/20 transition-all active:scale-95"
+                        <div className="flex flex-wrap gap-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar content-start">
+                           {repeatedStickers.length > 0 ? repeatedStickers.map(item => {
+                             const isExpanded = expandedSummaryGroups[`repeated-${item.id}`];
+                             return (
+                               <div key={item.id} className={cn("transition-all duration-300", isExpanded ? "w-full" : "w-auto")}>
+                                 <button 
+                                   onClick={() => toggleSummaryGroup(`repeated-${item.id}`)}
+                                   className={cn(
+                                     "px-4 h-10 rounded-full flex items-center gap-2 border transition-all font-black text-xs uppercase tracking-widest",
+                                     isExpanded 
+                                       ? "bg-amber-500 border-amber-500 text-white w-full" 
+                                       : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-amber-500/50"
+                                   )}
+                                 >
+                                   <span>{item.id}</span>
+                                   {isExpanded && <span className="opacity-80 font-bold ml-1 flex-1 text-left line-clamp-1">{item.name}</span>}
+                                   <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px]", isExpanded ? "bg-white/20" : "bg-gray-100 dark:bg-white/5")}>
+                                     {item.stickers.length}
+                                   </div>
+                                 </button>
+                                 <AnimatePresence>
+                                   {isExpanded && (
+                                     <motion.div 
+                                       initial={{ height: 0, opacity: 0 }}
+                                       animate={{ height: 'auto', opacity: 1 }}
+                                       exit={{ height: 0, opacity: 0 }}
+                                       className="overflow-hidden"
                                      >
-                                       {s.num}
-                                       <span className="absolute -top-2 -right-1 bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-black shadow-lg">x{s.count - 1}</span>
-                                     </button>
-                                   ))}
-                                </div>
-                             </div>
-                           )) : (
-                             <div className="text-center py-12 text-gray-400 italic text-sm">
+                                       <div className="p-4 mt-2 bg-gray-50 dark:bg-white/5 rounded-3xl border border-gray-200 dark:border-white/5">
+                                          <div className="flex flex-wrap gap-3">
+                                            {item.stickers.map(s => {
+                                              const playerName = PLAYER_NAMES[item.id]?.[s.num];
+                                              return (
+                                                <button 
+                                                 key={s.num}
+                                                 onClick={() => setSelectedTeam(item.id)}
+                                                 className="relative h-14 min-w-[60px] px-2 flex flex-col items-center justify-center bg-white dark:bg-gray-900 text-amber-600 dark:text-amber-400 rounded-2xl font-black border border-gray-100 dark:border-white/5 shadow-sm hover:border-amber-500/50 transition-all active:scale-95"
+                                                >
+                                                  <span className={cn(playerName ? "text-[11px]" : "text-sm")}>{s.num}</span>
+                                                  {playerName && (
+                                                    <span className="text-[8px] leading-tight uppercase font-bold text-center opacity-70 truncate w-full mt-0.5">
+                                                      {playerName}
+                                                    </span>
+                                                  )}
+                                                  <span className="absolute -top-2 -right-1 bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-black shadow-lg">x{s.count - 1}</span>
+                                                </button>
+                                              );
+                                            })}
+                                          </div>
+                                       </div>
+                                     </motion.div>
+                                   )}
+                                 </AnimatePresence>
+                               </div>
+                             );
+                           }) : (
+                             <div className="w-full text-center py-12 text-gray-400 italic text-sm">
                                 No tienes repetidas aún. ¡Sigue coleccionando!
                              </div>
                            )}
@@ -1060,10 +1287,26 @@ function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStick
   myStickers: Record<string, number> 
 }) {
   const progress = (ownedCount/20)*100;
+  const colors = COUNTRY_COLORS[team.id] || { primary: '#2563eb', secondary: '#ffffff', text: '#ffffff' };
+  
   return (
-    <motion.button whileHover={{ y: -4 }} onClick={onClick} className="bg-white dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-white/5 text-left shadow-lg hover:border-blue-500/30 transition-all relative overflow-hidden">
-      <div className="flex items-center gap-4 mb-4">
-        <span className="text-4xl">{team.flag}</span>
+    <motion.button 
+      whileHover={{ y: -4 }} 
+      onClick={onClick} 
+      className="bg-white dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-white/5 text-left shadow-lg hover:border-blue-500/30 transition-all relative overflow-hidden group"
+    >
+      {/* Flag Background Wash */}
+      <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.2] dark:opacity-[0.3] pointer-events-none transition-transform group-hover:scale-110">
+        <img src={getFlagUrl(team.id)} className="w-full h-full object-contain -translate-y-4 translate-x-4 rotate-12" alt="" referrerPolicy="no-referrer" />
+      </div>
+
+      <div className="flex items-center gap-4 mb-4 relative z-10">
+        <div 
+          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-lg border-2 border-white dark:border-gray-800"
+          style={{ backgroundColor: colors.primary }}
+        >
+          {team.flag}
+        </div>
         <div>
           <h3 className="font-black text-lg text-gray-900 dark:text-white uppercase leading-none mb-1">
             {team.name} <span className="text-gray-400 font-bold ml-1 text-sm">({team.id})</span>
@@ -1071,8 +1314,17 @@ function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStick
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Grupo {team.group} • {ownedCount}/20</p>
         </div>
       </div>
-      <div className="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden mb-2"><motion.div initial={{width:0}} animate={{width:`${progress}%`}} className={cn("h-full", progress===100?'bg-green-500':'bg-blue-600')} /></div>
-      {isComparing && compareData && <ComparisonBadge teamId={team.id} myStickers={myStickers} theirStickers={compareData.stickers} count={20} />}
+      
+      <div className="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden mb-2 relative z-10">
+        <motion.div 
+          initial={{width:0}} 
+          animate={{width:`${progress}%`}} 
+          className="h-full"
+          style={{ backgroundColor: progress === 100 ? '#10b981' : colors.primary }}
+        />
+      </div>
+      
+      {isComparing && compareData && <div className="relative z-10"><ComparisonBadge teamId={team.id} myStickers={myStickers} theirStickers={compareData.stickers} count={20} /></div>}
     </motion.button>
   );
 }
@@ -1105,54 +1357,90 @@ function TeamDetail({ teamId, onClose, compareData }: {
   const { stickers, updateSticker } = useAlbum();
   const team = TEAMS.find(t => t.id === teamId) || (SPECIALS as Record<string, { name: string; count: number; flag?: string }>)[teamId];
   const count = team.count || 20;
+  const colors = COUNTRY_COLORS[teamId] || { primary: '#2563eb', secondary: '#ffffff', text: '#ffffff' };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
-      <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative w-full max-w-4xl bg-white dark:bg-gray-950 sm:rounded-[40px] rounded-t-[40px] shadow-2xl p-8 overflow-y-auto max-h-[95vh]">
-        <div className="flex items-center justify-between mb-8 sticky top-0 bg-white dark:bg-gray-950 py-2 z-10">
-          <div className="flex items-center gap-5">
-             <div className="text-5xl drop-shadow-lg">{team.flag || '⚽'}</div>
-             <div>
-               <h3 className="text-3xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">
-                 {team.name} <span className="text-gray-400 font-bold ml-2">({teamId})</span>
-               </h3>
-               <div className="flex items-center gap-2">
-                 <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase">{count} fichas totales</p>
-                 <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-black">TIP: Mantén presionado para quitar</span>
-               </div>
-             </div>
+      <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative w-full max-w-4xl bg-white dark:bg-gray-950 sm:rounded-[40px] rounded-t-[40px] shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
+        
+        {/* Modal Header */}
+        <div className="relative p-8 overflow-hidden shrink-0">
+          {/* Flag Background Wash */}
+          <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.35] scale-150 rotate-12 blur-2xl pointer-events-none">
+             <img src={getFlagUrl(teamId)} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
           </div>
-          <div className="flex items-center gap-2">
-            <button onClick={onClose} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-100 dark:bg-white/5"><ChevronRight className="rotate-90 w-6 h-6" /></button>
+          
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="flex items-center gap-6">
+               <div 
+                 className="w-20 h-20 rounded-[28px] flex items-center justify-center text-5xl shadow-2xl border-4 border-white dark:border-gray-800"
+                 style={{ backgroundColor: colors.primary }}
+               >
+                 {team.flag || '⚽'}
+               </div>
+               <div>
+                 <h3 className="text-4xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">
+                   {team.name} <span className="text-gray-400 font-bold ml-2">({teamId})</span>
+                 </h3>
+                 <div className="flex items-center gap-3">
+                   <p className="text-gray-500 dark:text-gray-400 text-xs font-black uppercase tracking-widest">{count} fichas totales</p>
+                   <span className="h-1 w-1 rounded-full bg-gray-300" />
+                   <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-black">MANTÉN PARA QUITAR</span>
+                 </div>
+               </div>
+            </div>
+            <button 
+              onClick={onClose} 
+              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-100/50 dark:bg-white/5 backdrop-blur-md hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+            >
+              <ChevronRight className="rotate-90 w-6 h-6 text-gray-900 dark:text-white" />
+            </button>
           </div>
         </div>
-        {compareData && (
-          <div className="mb-8 p-5 rounded-3xl bg-green-500/10 border border-green-500/20 flex flex-col sm:flex-row items-center gap-4">
-             <div className="w-12 h-12 bg-green-500 rounded-2xl flex items-center justify-center shadow-lg"><ArrowLeftRight className="text-white w-6 h-6" /></div>
-             <div className="text-center sm:text-left flex-1"><p className="font-black text-green-600 dark:text-green-400 uppercase">Intercambio con {compareData.name}</p><p className="text-xs text-green-600/70 font-bold">Verde para ti, Naranja para tu amigo.</p></div>
+
+        <div className="flex-1 p-8 pt-0 overflow-y-auto">
+          {compareData && (
+            <motion.div 
+               initial={{ opacity: 0, y: -10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="mb-8 p-5 rounded-[24px] bg-green-500/10 border border-green-500/20 flex items-center gap-4"
+            >
+               <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg"><ArrowLeftRight className="text-white w-5 h-5" /></div>
+               <div className="flex-1">
+                 <p className="font-black text-green-600 dark:text-green-400 uppercase text-xs">Comparando con {compareData.name}</p>
+                 <p className="text-[10px] text-green-600/70 font-bold uppercase tracking-tight">Verde te falta a ti • Naranja le falta a él</p>
+               </div>
+            </motion.div>
+          )}
+
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3">
+            {Array.from({ length: count }, (_, i) => i + 1).map(num => {
+              const sId = `${teamId}-${num}`; const my = stickers[sId] || 0; const their = compareData?.stickers[sId] || 0;
+              const isSpecial = (teamId === '00' || teamId === 'FWC' || teamId === 'CC') || (num === 1 || num === 13);
+              const playerName = PLAYER_NAMES[teamId]?.[num];
+              let ring = ""; if (compareData) { if (my === 0 && their > 1) ring = "ring-4 ring-green-500 ring-offset-4 dark:ring-offset-gray-950"; if (their === 0 && my > 1) ring = "ring-4 ring-amber-500 ring-offset-4 dark:ring-offset-gray-950"; }
+              return (
+                <div key={sId} className="relative">
+                   <StickerButton 
+                     id={sId} 
+                     label={teamId === '00' ? '00' : (teamId === 'FWC' || teamId === 'CC') ? `${teamId}${num}` : `${num}`} 
+                     count={my} 
+                     onClick={() => updateSticker(sId, 1)} 
+                     onLongPress={() => updateSticker(sId, -1)} 
+                     className={ring}
+                     isSpecial={isSpecial}
+                     playerName={playerName}
+                   />
+                   {compareData && their > 0 && (
+                     <div className="absolute -top-1.5 -left-1.5 flex h-5 w-5 rounded-full bg-green-500 border-2 border-white dark:border-gray-950 z-20 shadow-sm flex items-center justify-center">
+                        <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                     </div>
+                   )}
+                </div>
+              );
+            })}
           </div>
-        )}
-        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3">
-          {Array.from({ length: count }, (_, i) => i + 1).map(num => {
-            const sId = `${teamId}-${num}`; const my = stickers[sId] || 0; const their = compareData?.stickers[sId] || 0;
-            const isSpecial = (teamId === '00' || teamId === 'FWC' || teamId === 'CC') || (num === 1 || num === 13);
-            let ring = ""; if (compareData) { if (my === 0 && their > 1) ring = "ring-2 ring-green-500 ring-offset-2 dark:ring-offset-gray-950"; if (their === 0 && my > 1) ring = "ring-2 ring-amber-500 ring-offset-2 dark:ring-offset-gray-950"; }
-            return (
-              <div key={sId} className="relative">
-                 <StickerButton 
-                   id={sId} 
-                   label={teamId === '00' ? '00' : (teamId === 'FWC' || teamId === 'CC') ? `${teamId}${num}` : `${num}`} 
-                   count={my} 
-                   onClick={() => updateSticker(sId, 1)} 
-                   onLongPress={() => updateSticker(sId, -1)} 
-                   className={ring}
-                   isSpecial={isSpecial}
-                 />
-                 {compareData && their > 0 && <div className="absolute -top-1 -left-1 flex h-4 w-4 rounded-full bg-green-500 border-2 border-white dark:border-gray-950 z-20" />}
-              </div>
-            );
-          })}
         </div>
       </motion.div>
     </div>

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
+import { getFlagUrl } from '../constants/countryData';
 
 interface StickerButtonProps {
   id: string;
@@ -10,6 +11,7 @@ interface StickerButtonProps {
   label?: string;
   className?: string;
   isSpecial?: boolean;
+  playerName?: string;
 }
 
 export const StickerButton: React.FC<StickerButtonProps> = ({ 
@@ -19,7 +21,8 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
   onLongPress,
   label,
   className,
-  isSpecial
+  isSpecial,
+  playerName
 }) => {
   const [isPressing, setIsPressing] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -66,6 +69,8 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
     e.preventDefault();
   };
 
+  const countryCode = id.includes('-') ? id.split('-')[0] : null;
+
   return (
     <motion.button
       whileTap={{ scale: 0.95 }}
@@ -74,7 +79,7 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
       onPointerCancel={handlePointerCancel}
       onContextMenu={handleContextMenu}
       className={cn(
-        "relative flex flex-col items-center justify-center h-14 w-full rounded-2xl border-2 transition-all duration-200 select-none touch-none",
+        "relative flex flex-col items-center justify-center h-14 w-full rounded-2xl border-2 transition-all duration-200 select-none touch-none overflow-hidden group",
         count > 0 
           ? cn(
               "text-white font-black shadow-lg shadow-blue-500/20",
@@ -90,7 +95,19 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
         className
       )}
     >
-      <span className="text-sm">{label || id.split('-').pop()}</span>
+      {/* Watermark Flag for regular stickers */}
+      {countryCode && count > 0 && !isSpecial && (
+        <div className="absolute inset-0 opacity-30 pointer-events-none group-hover:opacity-45 transition-opacity">
+          <img src={getFlagUrl(countryCode)} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+        </div>
+      )}
+
+      <span className={cn("relative z-10 text-sm", playerName ? "font-black" : "")}>{label || id.split('-').pop()}</span>
+      {playerName && (
+        <span className="relative z-10 text-[9px] leading-[1.1] uppercase font-bold text-center px-0.5 opacity-90 truncate w-full mt-0.5">
+          {playerName}
+        </span>
+      )}
       <AnimatePresence>
         {count > 1 && (
           <motion.span
