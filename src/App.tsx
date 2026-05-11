@@ -470,7 +470,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen pb-32">
+    <div className="min-h-screen pb-32 bg-[#050505] text-white">
       <Navbar />
       
       <main className="max-w-5xl mx-auto px-4 pt-8">
@@ -624,61 +624,61 @@ export default function App() {
         </AnimatePresence>
 
         {/* Filters */}
-        <div className="flex flex-col gap-6 mb-8">
-           <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl w-full sm:w-auto">
+        <div className="flex flex-col gap-4 mb-8">
+           <div className="flex flex-nowrap items-center justify-between gap-4 overflow-x-auto scrollbar-hide pb-1 sm:pb-0">
+              <div className="flex bg-white/5 p-1 rounded-2xl w-full sm:w-auto shrink-0">
                  {(['album', 'specials', 'summary', 'proposals'] as const).map((tab) => (
                    <button
                      key={tab}
                      onClick={() => setActiveTab(tab)}
                      className={cn(
-                       "flex-1 sm:flex-none px-6 py-2 rounded-xl text-xs font-black uppercase transition-all tracking-wider relative", 
-                       activeTab === tab ? "bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                       "flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase transition-all tracking-wider relative shrink-0", 
+                       activeTab === tab ? "bg-gray-800 text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
                      )}
                    >
                      {tab === 'album' ? 'Equipos' : tab === 'specials' ? 'Especiales' : tab === 'summary' ? 'Resumen' : 'Cambios'}
                      {tab === 'proposals' && proposals.length > 0 && (
-                       <span className="absolute -top-1 -right-1 flex h-4 w-4 rounded-full bg-red-500 text-white text-[8px] items-center justify-center border-2 border-white dark:border-gray-800">{proposals.length}</span>
+                       <span className="absolute -top-1 -right-1 flex h-4 w-4 rounded-full bg-red-500 text-white text-[8px] items-center justify-center border-2 border-gray-800">{proposals.length}</span>
                      )}
                    </button>
                  ))}
               </div>
+           </div>
 
-              <div className="flex items-center gap-3 w-full sm:w-auto">
-                <div className="relative flex-1 sm:max-w-xs">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Buscar por nombre o abreviado (ej: MEX)..." 
-                    value={searchQuery} 
-                    onChange={(e) => setSearchQuery(e.target.value)} 
-                    className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl outline-none transition-all text-sm shadow-sm" 
-                  />
-                </div>
-                 <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl shadow-inner">
-                   <button 
-                     onClick={() => setViewMode('groups')}
-                     className={cn(
-                       "px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-1.5",
-                       viewMode === 'groups' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                     )}
-                     title="Vista por Grupos"
-                   >
-                     <LayoutGrid className="w-3.5 h-3.5" />
-                     <span className="hidden sm:inline">Grupos</span>
-                   </button>
-                   <button 
-                     onClick={() => setViewMode('alphabetical')}
-                     className={cn(
-                       "px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center gap-1.5",
-                       viewMode === 'alphabetical' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                     )}
-                     title="Vista Alfabética"
-                   >
-                     <List className="w-3.5 h-3.5" />
-                     <span className="hidden sm:inline">A-Z</span>
-                   </button>
-                 </div>
+           <div className="flex flex-col sm:flex-row items-center gap-3">
+              <div className="relative flex-1 w-full group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                <input 
+                  type="text" 
+                  placeholder="Buscar por nombre o abreviado (ej: MEX)..." 
+                  value={searchQuery} 
+                  onChange={(e) => setSearchQuery(e.target.value)} 
+                  className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/5 focus:border-blue-500/50 rounded-2xl outline-none transition-all text-sm text-white placeholder:text-gray-600 shadow-inner" 
+                />
+              </div>
+              <div className="flex bg-white/5 p-1 rounded-2xl shadow-xl w-full sm:w-auto shrink-0">
+                 <button 
+                   onClick={() => setViewMode('groups')}
+                   className={cn(
+                     "flex-1 sm:flex-none px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-1.5",
+                     viewMode === 'groups' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-300"
+                   )}
+                   title="Vista por Grupos"
+                 >
+                   <LayoutGrid className="w-3.5 h-3.5" />
+                   <span>Grupos</span>
+                 </button>
+                 <button 
+                   onClick={() => setViewMode('alphabetical')}
+                   className={cn(
+                     "flex-1 sm:flex-none px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-1.5",
+                     viewMode === 'alphabetical' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-300"
+                   )}
+                   title="Vista Alfabética"
+                 >
+                   <List className="w-3.5 h-3.5" />
+                   <span>A-Z</span>
+                 </button>
               </div>
            </div>
 
@@ -735,34 +735,59 @@ export default function App() {
                     <div key={group.id} className="space-y-4">
                       <button 
                         onClick={() => toggleGroup(group.id)}
-                        className="w-full text-left flex items-center justify-between bg-gray-900 p-4 rounded-3xl border border-white/5 shadow-xl hover:border-blue-500/30 transition-all group overflow-hidden relative"
+                        className="w-full text-left flex items-center justify-between bg-gray-900 px-6 py-10 rounded-[2.5rem] border border-white/5 shadow-xl hover:border-blue-500/30 transition-all group overflow-hidden relative"
                       >
                         {/* Background Flags Grid */}
-                        <div className="absolute inset-0 grid grid-cols-4 opacity-30 dark:opacity-40 pointer-events-none blur-[1px]">
+                        <div className="absolute inset-0 flex opacity-[0.15] dark:opacity-20 pointer-events-none">
                           {group.teams.map(t => (
-                            <img key={t.id} src={getFlagUrl(t.id)} alt="" className="w-full h-full object-fill" referrerPolicy="no-referrer" />
+                            <div key={t.id} className="flex-1 h-full relative overflow-hidden">
+                              <img 
+                                src={getFlagUrl(t.id)} 
+                                alt="" 
+                                className="w-full h-full object-cover object-center scale-110" 
+                                referrerPolicy="no-referrer" 
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-40" />
+                            </div>
                           ))}
                         </div>
 
-                        <div className="flex items-center gap-4 relative z-10">
-                          <div className="flex -space-x-2 mr-2 bg-black/40 p-1.5 rounded-2xl backdrop-blur-sm border border-white/10">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 relative z-10 w-full">
+                          {/* Title & Progress Row for mobile */}
+                          <div className="flex items-center justify-between sm:contents">
+                            <div className="flex-1 sm:order-2">
+                              <h3 className="text-lg sm:text-xl font-black uppercase tracking-tighter text-white leading-tight">Grupo {group.id}</h3>
+                              <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">{group.owned} / {group.total} fichas</p>
+                            </div>
+                            
+                            <div className="flex items-center gap-3 sm:hidden bg-black/60 p-2 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">
+                               <div className="text-right">
+                                  <p className="text-sm font-black text-blue-400">{group.percent}%</p>
+                                  <div className="h-1 w-12 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                    <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600" />
+                                  </div>
+                               </div>
+                               <ChevronRight className={cn("w-4 h-4 text-gray-400 transition-transform", expandedGroupIds[group.id] && "rotate-90")} />
+                            </div>
+                          </div>
+
+                          {/* Flags Block */}
+                          <div className="flex -space-x-3 sm:order-1 self-start sm:self-center bg-black/60 p-2 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">
                             {group.teams.map(t => (
-                              <img key={t.id} src={getFlagUrl(t.id)} alt={t.name} className="w-6 h-6 rounded-full border-2 border-gray-800 object-cover shadow-sm" referrerPolicy="no-referrer" />
+                              <img key={t.id} src={getFlagUrl(t.id)} alt={t.name} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-gray-900 object-cover shadow-sm" referrerPolicy="no-referrer" />
                             ))}
                           </div>
-                          <div>
-                            <h3 className="text-lg font-black uppercase tracking-tighter text-white">Grupo {group.id}</h3>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{group.owned} / {group.total} fichas</p>
+                          
+                          {/* Desktop Progress Block */}
+                          <div className="hidden sm:flex items-center gap-4 sm:order-3 bg-black/60 p-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg ml-auto">
+                            <div className="text-right">
+                               <p className="text-base font-black text-blue-400">{group.percent}%</p>
+                               <div className="h-1.5 w-20 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                 <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]" />
+                               </div>
+                            </div>
+                            <ChevronRight className={cn("w-6 h-6 text-gray-400 transition-transform", expandedGroupIds[group.id] && "rotate-90")} />
                           </div>
-                        </div>
-                        <div className="flex items-center gap-4 relative z-10 bg-black/40 p-2 rounded-2xl backdrop-blur-sm border border-white/10">
-                          <div className="text-right">
-                             <p className="text-sm font-black text-blue-400">{group.percent}%</p>
-                             <div className="h-1 w-16 bg-white/5 rounded-full mt-1 overflow-hidden">
-                               <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600" />
-                             </div>
-                          </div>
-                          <ChevronRight className={cn("w-5 h-5 text-gray-400 transition-transform", expandedGroupIds[group.id] && "rotate-90")} />
                         </div>
                       </button>
 
@@ -804,7 +829,7 @@ export default function App() {
               >
                 {Object.entries(SPECIALS).map(([key, info]) => {
                   const owned = Object.keys(stickers).filter(id => id.startsWith(key)).filter(id => stickers[id]>0).length;
-                  return <button key={key} onClick={()=>setSelectedTeam(key)} className="bg-white dark:bg-gray-900 p-6 rounded-[28px] border border-gray-100 dark:border-white/5 shadow-lg text-left hover:border-blue-500 transition-all group">
+                  return <button key={key} onClick={()=>setSelectedTeam(key)} className="bg-gray-900 p-6 rounded-[28px] border border-white/5 shadow-lg text-left hover:border-blue-500 transition-all group">
                      <div className="flex items-center justify-between mb-4">
                         <div className={cn(
                           "w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black shadow-inner", 
@@ -834,14 +859,14 @@ export default function App() {
                >
                   <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">Propuestas Recibidas</h3>
                   {proposals.length === 0 ? (
-                    <div className="bg-white dark:bg-gray-900 p-12 rounded-[40px] text-center border border-dashed border-gray-200 dark:border-white/10">
+                    <div className="bg-gray-900 p-12 rounded-[40px] text-center border border-dashed border-white/10">
                        <ArrowLeftRight className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                        <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">No tienes propuestas pendientes</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        {proposals.map(proposal => (
-                         <div key={proposal.id} className="bg-white dark:bg-gray-900 p-6 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-xl space-y-6">
+                         <div key={proposal.id} className="bg-gray-900 p-6 rounded-[32px] border border-white/5 shadow-xl space-y-6">
                             <div className="flex items-center justify-between">
                                <div className="flex items-center gap-3">
                                   <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-xs">{proposal.fromId.substring(0,2)}</div>
@@ -900,7 +925,7 @@ export default function App() {
                                      </button>
                                      <button 
                                        onClick={() => updateProposalStatus(proposal.id, 'rejected')}
-                                       className="flex-1 bg-gray-100 dark:bg-white/5 text-gray-500 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-500 transition-all"
+                                       className="flex-1 bg-white/5 text-gray-500 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-red-500/10 hover:text-red-500 transition-all"
                                      >
                                        Rechazar
                                      </button>
@@ -963,7 +988,7 @@ export default function App() {
                                      "text-[10px] font-black px-2 py-1 rounded-lg border transition-all",
                                      tradeProposal.get.includes(id) 
                                       ? "bg-green-500 text-white border-green-500 shadow-lg shadow-green-500/20" 
-                                      : "bg-white dark:bg-gray-800 text-green-700 dark:text-green-400 border-green-200 dark:border-green-500/30 hover:bg-green-50"
+                                      : "bg-gray-800 text-green-400 border-green-500/30 hover:bg-green-500/10"
                                    )}
                                  >
                                    {id}
@@ -988,7 +1013,7 @@ export default function App() {
                                      "text-[10px] font-black px-2 py-1 rounded-lg border transition-all",
                                      tradeProposal.give.includes(id) 
                                       ? "bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/20" 
-                                      : "bg-white dark:bg-gray-800 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30 hover:bg-amber-50"
+                                      : "bg-gray-800 text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
                                    )}
                                  >
                                    {id}
@@ -1003,7 +1028,7 @@ export default function App() {
                         <motion.div 
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-white dark:bg-gray-900 p-6 rounded-[32px] border-2 border-blue-500 shadow-2xl flex flex-col md:flex-row items-center gap-6"
+                          className="bg-gray-900 p-6 rounded-[32px] border-2 border-blue-500 shadow-2xl flex flex-col md:flex-row items-center gap-6"
                         >
                           <div className="flex-1 flex items-center justify-center gap-6 text-sm">
                             <div className="flex flex-col items-center">
@@ -1053,7 +1078,7 @@ export default function App() {
                             "flex-1 min-w-[140px] px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 border-2",
                             quickView === 'escudos'
                               ? "bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/20"
-                              : "bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 text-gray-500 hover:border-amber-500/50"
+                              : "bg-gray-900 border-white/5 text-gray-500 hover:border-amber-500/50"
                           )}
                         >
                           <Trophy className="w-4 h-4" />
@@ -1065,7 +1090,7 @@ export default function App() {
                             "flex-1 min-w-[140px] px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 border-2",
                             quickView === 'equipos'
                               ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20"
-                              : "bg-white dark:bg-gray-900 border-gray-100 dark:border-white/5 text-gray-500 hover:border-blue-500/50"
+                              : "bg-gray-900 border-white/5 text-gray-500 hover:border-blue-500/50"
                           )}
                         >
                           <Users className="w-4 h-4" />
@@ -1074,7 +1099,7 @@ export default function App() {
                       </div>
 
                       {quickView && (
-                        <div className="mb-12 p-8 bg-gray-50 dark:bg-white/5 rounded-[40px] border border-gray-200 dark:border-white/5">
+                        <div className="mb-12 p-8 bg-white/5 rounded-[40px] border border-white/5">
                           <h3 className="text-2xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
                             <div className={cn("w-2 h-8 rounded-full", quickView === 'escudos' ? "bg-amber-500" : "bg-blue-600")} />
                             Vista Rápida: {quickView === 'escudos' ? 'Todos los Escudos' : 'Todos los Equipos'}
@@ -1133,7 +1158,7 @@ export default function App() {
                                      "px-4 h-10 rounded-full flex items-center gap-2 border transition-all font-black text-xs uppercase tracking-widest",
                                      isExpanded 
                                        ? "bg-red-500 border-red-500 text-white w-full" 
-                                       : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-red-500/50"
+                                       : "bg-gray-900 border-white/10 text-gray-400 hover:border-red-500/50"
                                    )}
                                  >
                                    <span>{item.id}</span>
@@ -1206,7 +1231,7 @@ export default function App() {
                                      "px-4 h-10 rounded-full flex items-center gap-2 border transition-all font-black text-xs uppercase tracking-widest",
                                      isExpanded 
                                        ? "bg-amber-500 border-amber-500 text-white w-full" 
-                                       : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-amber-500/50"
+                                       : "bg-gray-900 border-white/10 text-gray-400 hover:border-amber-500/50"
                                    )}
                                  >
                                    <span>{item.id}</span>
