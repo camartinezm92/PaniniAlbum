@@ -735,30 +735,30 @@ export default function App() {
                     <div key={group.id} className="space-y-4">
                       <button 
                         onClick={() => toggleGroup(group.id)}
-                        className="w-full text-left flex items-center justify-between bg-white dark:bg-gray-900 p-4 rounded-3xl border border-gray-100 dark:border-white/5 shadow-sm hover:border-blue-500/30 transition-all group overflow-hidden relative"
+                        className="w-full text-left flex items-center justify-between bg-gray-900 p-4 rounded-3xl border border-white/5 shadow-xl hover:border-blue-500/30 transition-all group overflow-hidden relative"
                       >
                         {/* Background Flags Grid */}
-                        <div className="absolute inset-0 grid grid-cols-4 opacity-40 dark:opacity-50 pointer-events-none blur-[1px]">
+                        <div className="absolute inset-0 grid grid-cols-4 opacity-30 dark:opacity-40 pointer-events-none blur-[1px]">
                           {group.teams.map(t => (
                             <img key={t.id} src={getFlagUrl(t.id)} alt="" className="w-full h-full object-fill" referrerPolicy="no-referrer" />
                           ))}
                         </div>
 
                         <div className="flex items-center gap-4 relative z-10">
-                          <div className="flex -space-x-2 mr-2 bg-white/50 dark:bg-gray-800/50 p-1.5 rounded-2xl backdrop-blur-sm border border-white/20">
+                          <div className="flex -space-x-2 mr-2 bg-black/40 p-1.5 rounded-2xl backdrop-blur-sm border border-white/10">
                             {group.teams.map(t => (
-                              <img key={t.id} src={getFlagUrl(t.id)} alt={t.name} className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-sm" referrerPolicy="no-referrer" />
+                              <img key={t.id} src={getFlagUrl(t.id)} alt={t.name} className="w-6 h-6 rounded-full border-2 border-gray-800 object-cover shadow-sm" referrerPolicy="no-referrer" />
                             ))}
                           </div>
                           <div>
-                            <h3 className="text-lg font-black uppercase tracking-tighter text-gray-900 dark:text-white">Grupo {group.id}</h3>
+                            <h3 className="text-lg font-black uppercase tracking-tighter text-white">Grupo {group.id}</h3>
                             <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{group.owned} / {group.total} fichas</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-4 relative z-10 bg-white/50 dark:bg-gray-800/50 p-2 rounded-2xl backdrop-blur-sm border border-white/20">
+                        <div className="flex items-center gap-4 relative z-10 bg-black/40 p-2 rounded-2xl backdrop-blur-sm border border-white/10">
                           <div className="text-right">
-                             <p className="text-sm font-black text-blue-600 dark:text-blue-400">{group.percent}%</p>
-                             <div className="h-1 w-16 bg-gray-100 dark:bg-white/5 rounded-full mt-1 overflow-hidden">
+                             <p className="text-sm font-black text-blue-400">{group.percent}%</p>
+                             <div className="h-1 w-16 bg-white/5 rounded-full mt-1 overflow-hidden">
                                <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600" />
                              </div>
                           </div>
@@ -1293,29 +1293,29 @@ function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStick
     <motion.button 
       whileHover={{ y: -4 }} 
       onClick={onClick} 
-      className="bg-white dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-white/5 text-left shadow-lg hover:border-blue-500/30 transition-all relative overflow-hidden group"
+      className="bg-gray-900 p-5 rounded-[28px] border border-white/5 text-left shadow-2xl hover:border-blue-500/30 transition-all relative overflow-hidden group"
     >
       {/* Flag Background Wash */}
-      <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.2] dark:opacity-[0.3] pointer-events-none transition-transform group-hover:scale-110">
+      <div className="absolute top-0 right-0 w-32 h-32 opacity-25 pointer-events-none transition-transform group-hover:scale-110">
         <img src={getFlagUrl(team.id)} className="w-full h-full object-contain -translate-y-4 translate-x-4 rotate-12" alt="" referrerPolicy="no-referrer" />
       </div>
 
       <div className="flex items-center gap-4 mb-4 relative z-10">
         <div 
-          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-lg border-2 border-white dark:border-gray-800"
+          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-lg border-2 border-gray-800"
           style={{ backgroundColor: colors.primary }}
         >
           {team.flag}
         </div>
         <div>
-          <h3 className="font-black text-lg text-gray-900 dark:text-white uppercase leading-none mb-1">
-            {team.name} <span className="text-gray-400 font-bold ml-1 text-sm">({team.id})</span>
+          <h3 className="font-black text-lg text-white uppercase leading-none mb-1">
+            {team.name} <span className="text-gray-500 font-bold ml-1 text-sm">({team.id})</span>
           </h3>
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Grupo {team.group} • {ownedCount}/20</p>
         </div>
       </div>
       
-      <div className="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden mb-2 relative z-10">
+      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-2 relative z-10">
         <motion.div 
           initial={{width:0}} 
           animate={{width:`${progress}%`}} 
@@ -1362,49 +1362,49 @@ function TeamDetail({ teamId, onClose, compareData }: {
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
-      <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative w-full max-w-4xl bg-white dark:bg-gray-950 sm:rounded-[40px] rounded-t-[40px] shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
+      <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative w-full max-w-4xl bg-gray-950 sm:rounded-[40px] rounded-t-[40px] shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
         
         {/* Modal Header */}
         <div className="relative p-8 overflow-hidden shrink-0">
           {/* Flag Background Wash */}
-          <div className="absolute inset-0 opacity-[0.25] dark:opacity-[0.35] scale-150 rotate-12 blur-2xl pointer-events-none">
+          <div className="absolute inset-0 opacity-[0.3] scale-150 rotate-12 blur-2xl pointer-events-none">
              <img src={getFlagUrl(teamId)} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
           </div>
           
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-6">
                <div 
-                 className="w-20 h-20 rounded-[28px] flex items-center justify-center text-5xl shadow-2xl border-4 border-white dark:border-gray-800"
+                 className="w-20 h-20 rounded-[28px] flex items-center justify-center text-5xl shadow-2xl border-4 border-gray-800"
                  style={{ backgroundColor: colors.primary }}
                >
                  {team.flag || '⚽'}
                </div>
                <div>
-                 <h3 className="text-4xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">
-                   {team.name} <span className="text-gray-400 font-bold ml-2">({teamId})</span>
+                 <h3 className="text-4xl font-black uppercase tracking-tighter text-white">
+                   {team.name} <span className="text-gray-500 font-bold ml-2">({teamId})</span>
                  </h3>
                  <div className="flex items-center gap-3">
-                   <p className="text-gray-500 dark:text-gray-400 text-xs font-black uppercase tracking-widest">{count} fichas totales</p>
-                   <span className="h-1 w-1 rounded-full bg-gray-300" />
-                   <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-black">MANTÉN PARA QUITAR</span>
+                   <p className="text-gray-400 text-xs font-black uppercase tracking-widest">{count} fichas totales</p>
+                   <span className="h-1 w-1 rounded-full bg-gray-600" />
+                   <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-black">MANTÉN PARA QUITAR</span>
                  </div>
                </div>
             </div>
             <button 
               onClick={onClose} 
-              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-100/50 dark:bg-white/5 backdrop-blur-md hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
+              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors"
             >
-              <ChevronRight className="rotate-90 w-6 h-6 text-gray-900 dark:text-white" />
+              <ChevronRight className="rotate-90 w-6 h-6 text-white" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 p-8 pt-0 overflow-y-auto">
+        <div className="flex-1 p-8 pt-6 overflow-y-auto overflow-x-hidden">
           {compareData && (
             <motion.div 
                initial={{ opacity: 0, y: -10 }}
                animate={{ opacity: 1, y: 0 }}
-               className="mb-8 p-5 rounded-[24px] bg-green-500/10 border border-green-500/20 flex items-center gap-4"
+               className="mb-10 p-5 rounded-[24px] bg-green-500/10 border border-green-500/20 flex items-center gap-4"
             >
                <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-lg"><ArrowLeftRight className="text-white w-5 h-5" /></div>
                <div className="flex-1">
@@ -1414,7 +1414,7 @@ function TeamDetail({ teamId, onClose, compareData }: {
             </motion.div>
           )}
 
-          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-x-3 gap-y-6 pb-12">
             {Array.from({ length: count }, (_, i) => i + 1).map(num => {
               const sId = `${teamId}-${num}`; const my = stickers[sId] || 0; const their = compareData?.stickers[sId] || 0;
               const isSpecial = (teamId === '00' || teamId === 'FWC' || teamId === 'CC') || (num === 1 || num === 13);

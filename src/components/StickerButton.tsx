@@ -79,7 +79,7 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
       onPointerCancel={handlePointerCancel}
       onContextMenu={handleContextMenu}
       className={cn(
-        "relative flex flex-col items-center justify-center h-14 w-full rounded-2xl border-2 transition-all duration-200 select-none touch-none overflow-hidden group",
+        "relative flex flex-col items-center justify-center h-14 w-full rounded-2xl border-2 transition-all duration-200 select-none touch-none group",
         count > 0 
           ? cn(
               "text-white font-black shadow-lg shadow-blue-500/20",
@@ -95,12 +95,15 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
         className
       )}
     >
-      {/* Watermark Flag for regular stickers */}
-      {countryCode && count > 0 && !isSpecial && (
-        <div className="absolute inset-0 opacity-30 pointer-events-none group-hover:opacity-45 transition-opacity">
-          <img src={getFlagUrl(countryCode)} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
-        </div>
-      )}
+      {/* Clipping Wrapper for Background & Watermark */}
+      <div className="absolute inset-0 rounded-[14px] overflow-hidden pointer-events-none">
+        {/* Watermark Flag for regular stickers */}
+        {countryCode && count > 0 && !isSpecial && (
+          <div className="absolute inset-0 opacity-30 pointer-events-none group-hover:opacity-45 transition-opacity">
+            <img src={getFlagUrl(countryCode)} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
+          </div>
+        )}
+      </div>
 
       <span className={cn("relative z-10 text-sm", playerName ? "font-black" : "")}>{label || id.split('-').pop()}</span>
       {playerName && (
@@ -114,7 +117,7 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full z-10 shadow-lg min-w-[20px] text-center"
+            className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full z-20 shadow-xl min-w-[24px] text-center font-black border-2 border-white dark:border-gray-900"
           >
             x{count}
           </motion.span>
