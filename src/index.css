@@ -4,6 +4,9 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Enable class-based dark mode for Tailwind v4 */
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;

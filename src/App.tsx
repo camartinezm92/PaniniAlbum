@@ -431,15 +431,15 @@ export default function App() {
   };
 
   if (authLoading) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505]">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-[#050505] transition-colors duration-300">
       <Trophy className="w-12 h-12 text-blue-500 animate-bounce mb-4" />
-      <span className="text-gray-500 font-medium animate-pulse">Cargando tu colección...</span>
+      <span className="text-gray-500 dark:text-gray-400 font-medium animate-pulse">Cargando tu colección...</span>
     </div>
   );
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#050505] flex flex-col">
+      <div className="min-h-screen bg-gray-50 dark:bg-[#050505] flex flex-col transition-colors duration-300">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-4xl mx-auto">
           <motion.div
@@ -449,10 +449,10 @@ export default function App() {
           >
             <Trophy className="w-24 h-24 text-blue-600 mx-auto" />
             <div className="space-y-4">
-              <h1 className="text-5xl font-black tracking-tighter text-white uppercase leading-tight">
+              <h1 className="text-5xl font-black tracking-tighter text-gray-900 dark:text-white uppercase leading-tight">
                 Tu Álbum Digital <br/> del <span className="text-blue-600">Mundial</span>
               </h1>
-              <p className="text-lg text-gray-400 max-w-md mx-auto">
+              <p className="text-lg text-gray-500 dark:text-gray-400 max-w-md mx-auto">
                 Gestiona tus fichas, evita repetidas e intercambia con amigos en tiempo real.
               </p>
             </div>
@@ -470,16 +470,16 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen pb-32 bg-[#050505] text-white">
+    <div className="min-h-screen pb-32 bg-gray-50 dark:bg-[#050505] text-gray-900 dark:text-white transition-colors duration-300">
       <Navbar />
       
       <main className="max-w-5xl mx-auto px-4 pt-8">
         {/* Dashboard Progress */}
-        <div className="bg-gray-900 rounded-[32px] p-6 mb-8 border border-white/5 shadow-2xl">
+        <div className="bg-white dark:bg-gray-900 rounded-[32px] p-6 mb-8 border border-gray-100 dark:border-white/5 shadow-2xl">
            <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="relative w-32 h-32 flex-shrink-0">
                  <svg className="w-full h-full -rotate-90">
-                    <circle cx="64" cy="64" r="58" className="stroke-white/5 fill-none" strokeWidth="10" />
+                    <circle cx="64" cy="64" r="58" className="stroke-gray-100 dark:stroke-white/5 fill-none" strokeWidth="10" />
                     <motion.circle 
                       cx="64" cy="64" r="58" 
                       className="stroke-blue-600 fill-none" 
@@ -491,7 +491,7 @@ export default function App() {
                     />
                  </svg>
                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-black text-white">{stats.percent}%</span>
+                    <span className="text-2xl font-black text-gray-900 dark:text-white">{stats.percent}%</span>
                     <span className="text-[10px] font-bold text-gray-400 uppercase">Proporción</span>
                  </div>
               </div>
@@ -499,7 +499,7 @@ export default function App() {
               <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
                  <button onClick={() => setActiveTab('album')} className="text-left hover:opacity-70 transition-opacity">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Obtenidas</span>
-                    <p className="text-2xl font-black text-white">{stats.owned} <span className="text-sm font-medium text-gray-500">/ {stats.totalTotal}</span></p>
+                    <p className="text-2xl font-black text-gray-900 dark:text-white">{stats.owned} <span className="text-sm font-medium text-gray-500">/ {stats.totalTotal}</span></p>
                  </button>
                  <button onClick={() => setActiveTab('summary')} className="text-left hover:opacity-70 transition-opacity">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faltan</span>
@@ -512,11 +512,11 @@ export default function App() {
               </div>
 
               <div className="flex flex-col gap-2 w-full md:w-auto">
-                 <div className="bg-white/5 p-4 rounded-2xl flex flex-col items-center gap-1 min-w-[140px]">
-                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Mi ID de Álbum</span>
+                 <div className="bg-gray-100 dark:bg-white/5 p-4 rounded-2xl flex flex-col items-center gap-1 min-w-[140px] shadow-inner">
+                   <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">Mi ID de Álbum</span>
                    <div className="flex items-center gap-2">
-                     <span className="text-xl font-black text-blue-400 tracking-widest">{shortId || '...'}</span>
-                     <button title="Copiar ID" onClick={shareAlbum} className="p-1 hover:text-blue-400 transition-colors text-white/50 hover:text-white">
+                     <span className="text-xl font-black text-blue-600 dark:text-blue-400 tracking-widest">{shortId || '...'}</span>
+                     <button title="Copiar ID" onClick={shareAlbum} className="p-1 hover:text-blue-400 transition-colors text-gray-400 dark:text-white/50 hover:text-blue-600 dark:hover:text-white">
                        <Copy className="w-3.5 h-3.5" />
                      </button>
                    </div>
@@ -565,11 +565,11 @@ export default function App() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden mb-8"
             >
-              <div className="bg-blue-600/10 border border-blue-600/20 p-6 rounded-[32px] space-y-6">
+              <div className="bg-blue-600/10 dark:bg-blue-600/20 border border-blue-600/20 p-6 rounded-[32px] space-y-6">
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <div className="flex-shrink-0">
-                     <h3 className="font-black uppercase text-sm tracking-widest text-blue-400 mb-1">Comparar con Amigo</h3>
-                     <p className="text-[10px] text-blue-400/60 font-bold uppercase tracking-widest">Ingresa su ID de 8 caracteres</p>
+                     <h3 className="font-black uppercase text-sm tracking-widest text-blue-600 dark:text-blue-400 mb-1">Comparar con Amigo</h3>
+                     <p className="text-[10px] text-blue-500/60 dark:text-blue-400/60 font-bold uppercase tracking-widest">Ingresa su ID de 8 caracteres</p>
                   </div>
                   <div className="flex-1 flex gap-2 w-full">
                     <input 
@@ -577,7 +577,7 @@ export default function App() {
                       placeholder="EJ: ABCD1234"
                       value={compareInput}
                       onChange={(e) => setCompareInput(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl px-4 py-3 outline-none font-black tracking-widest uppercase text-lg shadow-sm text-white"
+                      className="flex-1 bg-white/10 dark:bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl px-4 py-3 outline-none font-black tracking-widest uppercase text-lg shadow-sm text-gray-900 dark:text-white"
                     />
                     <button 
                       onClick={() => lookupByShortId()}
@@ -626,19 +626,19 @@ export default function App() {
         {/* Filters */}
         <div className="flex flex-col gap-4 mb-8">
            <div className="flex flex-nowrap items-center justify-between gap-4 overflow-x-auto scrollbar-hide pb-1 sm:pb-0">
-              <div className="flex bg-white/5 p-1 rounded-2xl w-full sm:w-auto shrink-0">
+              <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl w-full sm:w-auto shrink-0">
                  {(['album', 'specials', 'summary', 'proposals'] as const).map((tab) => (
                    <button
                      key={tab}
                      onClick={() => setActiveTab(tab)}
                      className={cn(
                        "flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase transition-all tracking-wider relative shrink-0", 
-                       activeTab === tab ? "bg-gray-800 text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
+                       activeTab === tab ? "bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                      )}
                    >
                      {tab === 'album' ? 'Equipos' : tab === 'specials' ? 'Especiales' : tab === 'summary' ? 'Resumen' : 'Cambios'}
                      {tab === 'proposals' && proposals.length > 0 && (
-                       <span className="absolute -top-1 -right-1 flex h-4 w-4 rounded-full bg-red-500 text-white text-[8px] items-center justify-center border-2 border-gray-800">{proposals.length}</span>
+                       <span className="absolute -top-1 -right-1 flex h-4 w-4 rounded-full bg-red-500 text-white text-[8px] items-center justify-center border-2 border-white dark:border-gray-800">{proposals.length}</span>
                      )}
                    </button>
                  ))}
@@ -647,21 +647,21 @@ export default function App() {
 
            <div className="flex flex-col sm:flex-row items-center gap-3">
               <div className="relative flex-1 w-full group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                 <input 
                   type="text" 
                   placeholder="Buscar por nombre o abreviado (ej: MEX)..." 
                   value={searchQuery} 
                   onChange={(e) => setSearchQuery(e.target.value)} 
-                  className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/5 focus:border-blue-500/50 rounded-2xl outline-none transition-all text-sm text-white placeholder:text-gray-600 shadow-inner" 
+                  className="w-full pl-11 pr-4 py-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/5 focus:border-blue-500/50 rounded-2xl outline-none transition-all text-sm text-gray-900 dark:text-white placeholder:text-gray-400 shadow-sm" 
                 />
               </div>
-              <div className="flex bg-white/5 p-1 rounded-2xl shadow-xl w-full sm:w-auto shrink-0">
+              <div className="flex bg-gray-100 dark:bg-white/5 p-1 rounded-2xl shadow-inner w-full sm:w-auto shrink-0">
                  <button 
                    onClick={() => setViewMode('groups')}
                    className={cn(
                      "flex-1 sm:flex-none px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-1.5",
-                     viewMode === 'groups' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-300"
+                     viewMode === 'groups' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                    )}
                    title="Vista por Grupos"
                  >
@@ -672,7 +672,7 @@ export default function App() {
                    onClick={() => setViewMode('alphabetical')}
                    className={cn(
                      "flex-1 sm:flex-none px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-1.5",
-                     viewMode === 'alphabetical' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-300"
+                     viewMode === 'alphabetical' ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                    )}
                    title="Vista Alfabética"
                  >
@@ -733,12 +733,12 @@ export default function App() {
                 {viewMode === 'groups' && !selectedGroup && !searchQuery ? (
                   groups.map(group => (
                     <div key={group.id} className="space-y-4">
-                      <button 
+                       <button 
                         onClick={() => toggleGroup(group.id)}
-                        className="w-full text-left flex items-center justify-between bg-gray-900 px-6 py-10 rounded-[2.5rem] border border-white/5 shadow-xl hover:border-blue-500/30 transition-all group overflow-hidden relative"
+                        className="w-full text-left flex items-center justify-between bg-white dark:bg-gray-900 px-6 py-10 rounded-[2.5rem] border border-gray-100 dark:border-white/5 shadow-xl hover:border-blue-500/30 transition-all group overflow-hidden relative"
                       >
                         {/* Background Flags Grid */}
-                        <div className="absolute inset-0 flex opacity-[0.15] dark:opacity-20 pointer-events-none">
+                        <div className="absolute inset-0 flex opacity-[0.1] dark:opacity-20 pointer-events-none">
                           {group.teams.map(t => (
                             <div key={t.id} className="flex-1 h-full relative overflow-hidden">
                               <img 
@@ -747,7 +747,7 @@ export default function App() {
                                 className="w-full h-full object-cover object-center scale-110" 
                                 referrerPolicy="no-referrer" 
                               />
-                              <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-40" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-gray-900 via-transparent to-transparent opacity-40" />
                             </div>
                           ))}
                         </div>
@@ -756,14 +756,14 @@ export default function App() {
                           {/* Title & Progress Row for mobile */}
                           <div className="flex items-center justify-between sm:contents">
                             <div className="flex-1 sm:order-2">
-                              <h3 className="text-lg sm:text-xl font-black uppercase tracking-tighter text-white leading-tight">Grupo {group.id}</h3>
-                              <p className="text-[9px] sm:text-[10px] font-bold text-gray-400 uppercase tracking-widest">{group.owned} / {group.total} fichas</p>
+                              <h3 className="text-lg sm:text-xl font-black uppercase tracking-tighter text-gray-900 dark:text-white leading-tight">Grupo {group.id}</h3>
+                              <p className="text-[9px] sm:text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest">{group.owned} / {group.total} fichas</p>
                             </div>
                             
-                            <div className="flex items-center gap-3 sm:hidden bg-black/60 p-2 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">
+                            <div className="flex items-center gap-3 sm:hidden bg-gray-100 dark:bg-black/60 p-2 rounded-2xl backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-lg">
                                <div className="text-right">
-                                  <p className="text-sm font-black text-blue-400">{group.percent}%</p>
-                                  <div className="h-1 w-12 bg-white/10 rounded-full mt-1 overflow-hidden">
+                                  <p className="text-sm font-black text-blue-600 dark:text-blue-400">{group.percent}%</p>
+                                  <div className="h-1 w-12 bg-gray-200 dark:bg-white/10 rounded-full mt-1 overflow-hidden">
                                     <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600" />
                                   </div>
                                </div>
@@ -772,18 +772,18 @@ export default function App() {
                           </div>
 
                           {/* Flags Block */}
-                          <div className="flex -space-x-3 sm:order-1 self-start sm:self-center bg-black/60 p-2 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">
+                          <div className="flex -space-x-3 sm:order-1 self-start sm:self-center bg-white/60 dark:bg-black/60 p-2 rounded-2xl backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-lg">
                             {group.teams.map(t => (
-                              <img key={t.id} src={getFlagUrl(t.id)} alt={t.name} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-gray-900 object-cover shadow-sm" referrerPolicy="no-referrer" />
+                              <img key={t.id} src={getFlagUrl(t.id)} alt={t.name} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white dark:border-gray-900 object-cover shadow-sm" referrerPolicy="no-referrer" />
                             ))}
                           </div>
                           
                           {/* Desktop Progress Block */}
-                          <div className="hidden sm:flex items-center gap-4 sm:order-3 bg-black/60 p-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg ml-auto">
+                          <div className="hidden sm:flex items-center gap-4 sm:order-3 bg-white/60 dark:bg-black/60 p-3 rounded-2xl backdrop-blur-md border border-gray-200 dark:border-white/10 shadow-lg ml-auto">
                             <div className="text-right">
-                               <p className="text-base font-black text-blue-400">{group.percent}%</p>
-                               <div className="h-1.5 w-20 bg-white/10 rounded-full mt-1 overflow-hidden">
-                                 <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]" />
+                               <p className="text-base font-black text-blue-600 dark:text-blue-400">{group.percent}%</p>
+                               <div className="h-1.5 w-20 bg-gray-200 dark:bg-white/10 rounded-full mt-1 overflow-hidden">
+                                 <motion.div initial={{width:0}} animate={{width:`${group.percent}%`}} className="h-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.2)]" />
                                </div>
                             </div>
                             <ChevronRight className={cn("w-6 h-6 text-gray-400 transition-transform", expandedGroupIds[group.id] && "rotate-90")} />
@@ -829,7 +829,7 @@ export default function App() {
               >
                 {Object.entries(SPECIALS).map(([key, info]) => {
                   const owned = Object.keys(stickers).filter(id => id.startsWith(key)).filter(id => stickers[id]>0).length;
-                  return <button key={key} onClick={()=>setSelectedTeam(key)} className="bg-gray-900 p-6 rounded-[28px] border border-white/5 shadow-lg text-left hover:border-blue-500 transition-all group">
+                  return <button key={key} onClick={()=>setSelectedTeam(key)} className="bg-white dark:bg-gray-900 p-6 rounded-[28px] border border-gray-100 dark:border-white/5 shadow-lg text-left hover:border-blue-500 transition-all group">
                      <div className="flex items-center justify-between mb-4">
                         <div className={cn(
                           "w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-black shadow-inner", 
@@ -859,14 +859,14 @@ export default function App() {
                >
                   <h3 className="text-2xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">Propuestas Recibidas</h3>
                   {proposals.length === 0 ? (
-                    <div className="bg-gray-900 p-12 rounded-[40px] text-center border border-dashed border-white/10">
+                    <div className="bg-white dark:bg-gray-900 p-12 rounded-[40px] text-center border border-dashed border-gray-200 dark:border-white/10">
                        <ArrowLeftRight className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                        <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">No tienes propuestas pendientes</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                        {proposals.map(proposal => (
-                         <div key={proposal.id} className="bg-gray-900 p-6 rounded-[32px] border border-white/5 shadow-xl space-y-6">
+                         <div key={proposal.id} className="bg-white dark:bg-gray-900 p-6 rounded-[32px] border border-gray-100 dark:border-white/5 shadow-xl space-y-6">
                             <div className="flex items-center justify-between">
                                <div className="flex items-center gap-3">
                                   <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-black text-xs">{proposal.fromId.substring(0,2)}</div>
@@ -925,7 +925,7 @@ export default function App() {
                                      </button>
                                      <button 
                                        onClick={() => updateProposalStatus(proposal.id, 'rejected')}
-                                       className="flex-1 bg-white/5 text-gray-500 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-red-500/10 hover:text-red-500 transition-all"
+                                       className="flex-1 bg-gray-100 dark:bg-white/5 text-gray-500 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-red-500/10 hover:text-red-500 transition-all"
                                      >
                                        Rechazar
                                      </button>
@@ -971,12 +971,12 @@ export default function App() {
                   {isComparing && comparisonDeal && (
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         <div className="bg-green-500/10 border border-green-500/20 p-6 rounded-[32px] space-y-4">
+                         <div className="bg-green-500/10 dark:bg-green-500/20 border border-green-500/20 dark:border-green-500/30 p-6 rounded-[32px] space-y-4">
                             <div className="flex items-center gap-3">
                                <div className="p-2 bg-green-500 rounded-xl"><ArrowLeftRight className="text-white w-5 h-5"/></div>
                                <div>
                                  <h4 className="font-black uppercase tracking-tight text-green-700 dark:text-green-400">Me sirven de {compareData?.name}</h4>
-                                 <p className="text-[9px] font-bold text-green-600/60 uppercase">Toca para pedir en cambio</p>
+                                 <p className="text-[9px] font-bold text-green-600/60 dark:text-green-400/60 uppercase">Toca para pedir en cambio</p>
                                </div>
                             </div>
                             <div className="flex flex-wrap gap-2">
@@ -988,7 +988,7 @@ export default function App() {
                                      "text-[10px] font-black px-2 py-1 rounded-lg border transition-all",
                                      tradeProposal.get.includes(id) 
                                       ? "bg-green-500 text-white border-green-500 shadow-lg shadow-green-500/20" 
-                                      : "bg-gray-800 text-green-400 border-green-500/30 hover:bg-green-500/10"
+                                      : "bg-white dark:bg-gray-800 text-green-600 dark:text-green-400 border-green-500/30 hover:bg-green-500/10"
                                    )}
                                  >
                                    {id}
@@ -996,12 +996,12 @@ export default function App() {
                                )) : <p className="text-xs text-green-600/50">No hay intercambios directos que me sirvan.</p>}
                             </div>
                          </div>
-                         <div className="bg-amber-500/10 border border-amber-500/20 p-6 rounded-[32px] space-y-4">
+                         <div className="bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/20 dark:border-amber-500/30 p-6 rounded-[32px] space-y-4">
                             <div className="flex items-center gap-3">
                                <div className="p-2 bg-amber-500 rounded-xl"><ArrowLeftRight className="text-white w-5 h-5"/></div>
                                <div>
                                  <h4 className="font-black uppercase tracking-tight text-amber-700 dark:text-amber-400">Le sirven a {compareData?.name}</h4>
-                                 <p className="text-[9px] font-bold text-amber-600/60 uppercase">Toca para ofrecer en cambio</p>
+                                 <p className="text-[9px] font-bold text-amber-600/60 dark:text-amber-400/60 uppercase">Toca para ofrecer en cambio</p>
                                </div>
                             </div>
                             <div className="flex flex-wrap gap-2">
@@ -1013,7 +1013,7 @@ export default function App() {
                                      "text-[10px] font-black px-2 py-1 rounded-lg border transition-all",
                                      tradeProposal.give.includes(id) 
                                       ? "bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/20" 
-                                      : "bg-gray-800 text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
+                                      : "bg-white dark:bg-gray-800 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
                                    )}
                                  >
                                    {id}
@@ -1028,26 +1028,26 @@ export default function App() {
                         <motion.div 
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="bg-gray-900 p-6 rounded-[32px] border-2 border-blue-500 shadow-2xl flex flex-col md:flex-row items-center gap-6"
+                          className="bg-white dark:bg-gray-900 p-6 rounded-[32px] border-2 border-blue-500 shadow-2xl flex flex-col md:flex-row items-center gap-6"
                         >
                           <div className="flex-1 flex items-center justify-center gap-6 text-sm">
                             <div className="flex flex-col items-center">
-                              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Doy ({tradeProposal.give.length})</span>
+                              <span className="text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Doy ({tradeProposal.give.length})</span>
                               <div className="flex -space-x-1">
                                 {tradeProposal.give.slice(0, 5).map(id => (
                                   <div key={id} className="h-6 px-1.5 rounded-md bg-amber-500 border border-white dark:border-gray-800 flex items-center justify-center text-[8px] font-bold text-white shadow-sm">{id}</div>
                                 ))}
-                                {tradeProposal.give.length > 5 && <div className="h-6 px-1.5 rounded-md bg-amber-100 dark:bg-amber-900 text-[8px] font-black text-amber-700 dark:text-amber-400 border border-amber-200">+{tradeProposal.give.length - 5}</div>}
+                                {tradeProposal.give.length > 5 && <div className="h-6 px-1.5 rounded-md bg-amber-100 dark:bg-amber-900 text-[8px] font-black text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-white/10">+{tradeProposal.give.length - 5}</div>}
                               </div>
                             </div>
                             <ArrowLeftRight className="w-5 h-5 text-blue-500 animate-pulse shrink-0" />
                             <div className="flex flex-col items-center">
-                              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Recibo ({tradeProposal.get.length})</span>
+                              <span className="text-[9px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1.5">Recibo ({tradeProposal.get.length})</span>
                               <div className="flex -space-x-1">
                                 {tradeProposal.get.slice(0, 5).map(id => (
                                   <div key={id} className="h-6 px-1.5 rounded-md bg-green-500 border border-white dark:border-gray-800 flex items-center justify-center text-[8px] font-bold text-white shadow-sm">{id}</div>
                                 ))}
-                                {tradeProposal.get.length > 5 && <div className="h-6 px-1.5 rounded-md bg-green-100 dark:bg-green-900 text-[8px] font-black text-green-700 dark:text-green-400 border border-green-200">+{tradeProposal.get.length - 5}</div>}
+                                {tradeProposal.get.length > 5 && <div className="h-6 px-1.5 rounded-md bg-green-100 dark:bg-green-900 text-[8px] font-black text-green-700 dark:text-green-400 border border-green-200 dark:border-white/10">+{tradeProposal.get.length - 5}</div>}
                               </div>
                             </div>
                           </div>
@@ -1078,7 +1078,7 @@ export default function App() {
                             "flex-1 min-w-[140px] px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 border-2",
                             quickView === 'escudos'
                               ? "bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/20"
-                              : "bg-gray-900 border-white/5 text-gray-500 hover:border-amber-500/50"
+                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/5 text-gray-500 hover:border-amber-500/50 shadow-sm"
                           )}
                         >
                           <Trophy className="w-4 h-4" />
@@ -1090,7 +1090,7 @@ export default function App() {
                             "flex-1 min-w-[140px] px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 border-2",
                             quickView === 'equipos'
                               ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20"
-                              : "bg-gray-900 border-white/5 text-gray-500 hover:border-blue-500/50"
+                              : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/5 text-gray-500 hover:border-blue-500/50 shadow-sm"
                           )}
                         >
                           <Users className="w-4 h-4" />
@@ -1099,7 +1099,7 @@ export default function App() {
                       </div>
 
                       {quickView && (
-                        <div className="mb-12 p-8 bg-white/5 rounded-[40px] border border-white/5">
+                        <div className="mb-12 p-8 bg-gray-100/50 dark:bg-white/5 rounded-[40px] border border-gray-200 dark:border-white/5">
                           <h3 className="text-2xl font-black uppercase tracking-tighter mb-8 flex items-center gap-3">
                             <div className={cn("w-2 h-8 rounded-full", quickView === 'escudos' ? "bg-amber-500" : "bg-blue-600")} />
                             Vista Rápida: {quickView === 'escudos' ? 'Todos los Escudos' : 'Todos los Equipos'}
@@ -1141,7 +1141,7 @@ export default function App() {
                            </h3>
                            <button 
                              onClick={copyMissingList}
-                             className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-red-500/10 hover:text-red-500 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest text-gray-500"
+                             className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-red-500/10 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-500 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest text-gray-500"
                            >
                              <Copy className="w-3 h-3" />
                              Copiar Texto
@@ -1158,12 +1158,12 @@ export default function App() {
                                      "px-4 h-10 rounded-full flex items-center gap-2 border transition-all font-black text-xs uppercase tracking-widest",
                                      isExpanded 
                                        ? "bg-red-500 border-red-500 text-white w-full" 
-                                       : "bg-gray-900 border-white/10 text-gray-400 hover:border-red-500/50"
+                                       : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/10 text-gray-400 hover:border-red-500/50 shadow-sm"
                                    )}
                                  >
                                    <span>{item.id}</span>
                                    {isExpanded && <span className="opacity-80 font-bold ml-1 flex-1 text-left line-clamp-1">{item.name}</span>}
-                                   <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px]", isExpanded ? "bg-white/20" : "bg-gray-100 dark:bg-white/5")}>
+                                   <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px]", isExpanded ? "bg-white/20" : "bg-gray-200 dark:bg-white/5")}>
                                      {item.stickers.length}
                                    </div>
                                  </button>
@@ -1214,7 +1214,7 @@ export default function App() {
                            </h3>
                            <button 
                              onClick={copyRepeatedList}
-                             className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-amber-500/10 hover:text-amber-500 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest text-gray-500"
+                             className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-amber-500/10 dark:hover:bg-amber-500/20 hover:text-amber-600 dark:hover:text-amber-500 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest text-gray-500"
                            >
                              <Copy className="w-3 h-3" />
                              Copiar Texto
@@ -1231,12 +1231,12 @@ export default function App() {
                                      "px-4 h-10 rounded-full flex items-center gap-2 border transition-all font-black text-xs uppercase tracking-widest",
                                      isExpanded 
                                        ? "bg-amber-500 border-amber-500 text-white w-full" 
-                                       : "bg-gray-900 border-white/10 text-gray-400 hover:border-amber-500/50"
+                                       : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/10 text-gray-400 hover:border-amber-500/50 shadow-sm"
                                    )}
                                  >
                                    <span>{item.id}</span>
                                    {isExpanded && <span className="opacity-80 font-bold ml-1 flex-1 text-left line-clamp-1">{item.name}</span>}
-                                   <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px]", isExpanded ? "bg-white/20" : "bg-gray-100 dark:bg-white/5")}>
+                                   <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px]", isExpanded ? "bg-white/20" : "bg-gray-200 dark:bg-white/5")}>
                                      {item.stickers.length}
                                    </div>
                                  </button>
@@ -1293,7 +1293,7 @@ export default function App() {
       
       {/* Mobile Nav */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 sm:hidden">
-          <div className="flex bg-black/80 dark:bg-white/10 backdrop-blur-xl p-2 rounded-3xl border border-white/20 shadow-2xl items-center gap-2">
+          <div className="flex bg-white/90 dark:bg-white/10 backdrop-blur-xl p-2 rounded-3xl border border-gray-200 dark:border-white/20 shadow-2xl items-center gap-2">
              <button onClick={()=>setActiveTab('album')} className={cn("p-4 rounded-2xl", activeTab === 'album' ? "bg-blue-600 text-white" : "text-gray-400")}><Trophy className="w-6 h-6" /></button>
              <button onClick={()=>setActiveTab('specials')} className={cn("p-4 rounded-2xl", activeTab === 'specials' ? "bg-blue-600 text-white" : "text-gray-400")}><LayoutGrid className="w-6 h-6" /></button>
              <button onClick={shareAlbum} className="p-4 rounded-2xl text-gray-400"><Share2 className="w-6 h-6" /></button>
@@ -1318,7 +1318,7 @@ function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStick
     <motion.button 
       whileHover={{ y: -4 }} 
       onClick={onClick} 
-      className="bg-gray-900 p-5 rounded-[28px] border border-white/5 text-left shadow-2xl hover:border-blue-500/30 transition-all relative overflow-hidden group"
+      className="bg-white dark:bg-gray-900 p-5 rounded-[28px] border border-gray-100 dark:border-white/5 text-left shadow-2xl hover:border-blue-500/30 transition-all relative overflow-hidden group"
     >
       {/* Flag Background Wash */}
       <div className="absolute top-0 right-0 w-32 h-32 opacity-25 pointer-events-none transition-transform group-hover:scale-110">
@@ -1327,20 +1327,20 @@ function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStick
 
       <div className="flex items-center gap-4 mb-4 relative z-10">
         <div 
-          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-lg border-2 border-gray-800"
+          className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shadow-lg border-2 border-white dark:border-gray-800"
           style={{ backgroundColor: colors.primary }}
         >
           {team.flag}
         </div>
         <div>
-          <h3 className="font-black text-lg text-white uppercase leading-none mb-1">
+          <h3 className="font-black text-lg text-gray-900 dark:text-white uppercase leading-none mb-1">
             {team.name} <span className="text-gray-500 font-bold ml-1 text-sm">({team.id})</span>
           </h3>
           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Grupo {team.group} • {ownedCount}/20</p>
         </div>
       </div>
       
-      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden mb-2 relative z-10">
+      <div className="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden mb-2 relative z-10">
         <motion.div 
           initial={{width:0}} 
           animate={{width:`${progress}%`}} 
@@ -1386,40 +1386,40 @@ function TeamDetail({ teamId, onClose, compareData }: {
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
-      <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative w-full max-w-4xl bg-gray-950 sm:rounded-[40px] rounded-t-[40px] shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-xl" />
+      <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} className="relative w-full max-w-4xl bg-white dark:bg-gray-950 sm:rounded-[40px] rounded-t-[40px] shadow-2xl overflow-hidden max-h-[95vh] flex flex-col">
         
         {/* Modal Header */}
         <div className="relative p-8 overflow-hidden shrink-0">
           {/* Flag Background Wash */}
-          <div className="absolute inset-0 opacity-[0.3] scale-150 rotate-12 blur-2xl pointer-events-none">
+          <div className="absolute inset-0 opacity-[0.2] dark:opacity-[0.3] scale-150 rotate-12 blur-2xl pointer-events-none">
              <img src={getFlagUrl(teamId)} className="w-full h-full object-cover" alt="" referrerPolicy="no-referrer" />
           </div>
           
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-6">
                <div 
-                 className="w-20 h-20 rounded-[28px] flex items-center justify-center text-5xl shadow-2xl border-4 border-gray-800"
+                 className="w-20 h-20 rounded-[28px] flex items-center justify-center text-5xl shadow-2xl border-4 border-white dark:border-gray-800"
                  style={{ backgroundColor: colors.primary }}
                >
                  {team.flag || '⚽'}
                </div>
                <div>
-                 <h3 className="text-4xl font-black uppercase tracking-tighter text-white">
+                 <h3 className="text-4xl font-black uppercase tracking-tighter text-gray-900 dark:text-white">
                    {team.name} <span className="text-gray-500 font-bold ml-2">({teamId})</span>
                  </h3>
                  <div className="flex items-center gap-3">
-                   <p className="text-gray-400 text-xs font-black uppercase tracking-widest">{count} fichas totales</p>
-                   <span className="h-1 w-1 rounded-full bg-gray-600" />
-                   <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-black">MANTÉN PARA QUITAR</span>
+                   <p className="text-gray-500 dark:text-gray-400 text-xs font-black uppercase tracking-widest">{count} fichas totales</p>
+                   <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-gray-600" />
+                   <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-black">MANTÉN PARA QUITAR</span>
                  </div>
                </div>
             </div>
             <button 
               onClick={onClose} 
-              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors"
+              className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/20 dark:bg-white/5 backdrop-blur-md hover:bg-white/30 dark:hover:bg-white/10 transition-colors border border-white/20"
             >
-              <ChevronRight className="rotate-90 w-6 h-6 text-white" />
+              <ChevronRight className="rotate-90 w-6 h-6 text-gray-900 dark:text-white" />
             </button>
           </div>
         </div>

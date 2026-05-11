@@ -88,8 +88,8 @@ export const StickerButton: React.FC<StickerButtonProps> = ({
                 : "bg-blue-600 border-blue-600"
             )
           : cn(
-              "bg-white dark:bg-gray-800 border-gray-100 dark:border-white/5 text-gray-400 hover:border-blue-500/30",
-              isSpecial && "border-amber-500/30 bg-amber-50/5 dark:bg-amber-900/10"
+              "bg-gray-50/50 dark:bg-gray-800/40 border-gray-100 dark:border-white/5 text-gray-500 hover:border-blue-500/30",
+              isSpecial && "border-amber-500/30 bg-amber-50 dark:bg-amber-900/10"
             ),
         isPressing && "scale-95",
         className
