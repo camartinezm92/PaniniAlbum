@@ -405,11 +405,11 @@ export default function App() {
   const [quickView, setQuickView] = useState<'escudos' | 'equipos' | null>(null);
 
   const toggleSummaryGroup = (id: string) => {
-    setExpandedSummaryGroups(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpandedSummaryGroups(prev => ({ [id]: !prev[id] }));
   };
 
   const toggleGroup = (id: string) => {
-    setExpandedGroupIds(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpandedGroupIds(prev => ({ [id]: !prev[id] }));
   };
 
   const copyMissingList = () => {
