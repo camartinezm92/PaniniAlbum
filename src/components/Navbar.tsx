@@ -23,7 +23,7 @@ export const Navbar: React.FC = () => {
   }, []);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-white/80 dark:bg-black/80 backdrop-blur-md border-gray-200 dark:border-gray-800">
+    <nav className="sticky top-0 z-50 w-full border-b bg-black/80 backdrop-blur-md border-gray-800">
       <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Trophy className="text-yellow-500 w-6 h-6" />
@@ -41,7 +41,7 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={toggleTheme}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-2 rounded-full hover:bg-gray-800 transition-colors"
             title={theme === 'dark' ? 'Modo Claro' : 'Modo Oscuro'}
             id="theme-toggle"
           >
@@ -51,12 +51,12 @@ export const Navbar: React.FC = () => {
           {user ? (
             <div className="flex items-center gap-3">
                <div className="hidden sm:flex flex-col items-end">
-                <span className="text-xs font-medium text-gray-900 dark:text-gray-100">{user.displayName}</span>
+                <span className="text-xs font-medium text-gray-100">{user.displayName}</span>
                 <span className="text-[10px] text-gray-500 uppercase">Mi Album</span>
               </div>
               <img 
                 src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}`} 
-                className="w-8 h-8 rounded-full border border-gray-200 dark:border-gray-700" 
+                className="w-8 h-8 rounded-full border border-gray-700" 
                 alt="Profile" 
               />
               <button

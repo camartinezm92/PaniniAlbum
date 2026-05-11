@@ -431,7 +431,7 @@ export default function App() {
   };
 
   if (authLoading) return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-[#050505]">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#050505]">
       <Trophy className="w-12 h-12 text-blue-500 animate-bounce mb-4" />
       <span className="text-gray-500 font-medium animate-pulse">Cargando tu colección...</span>
     </div>
@@ -439,7 +439,7 @@ export default function App() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-white dark:bg-[#050505] flex flex-col">
+      <div className="min-h-screen bg-[#050505] flex flex-col">
         <Navbar />
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center max-w-4xl mx-auto">
           <motion.div
@@ -449,10 +449,10 @@ export default function App() {
           >
             <Trophy className="w-24 h-24 text-blue-600 mx-auto" />
             <div className="space-y-4">
-              <h1 className="text-5xl font-black tracking-tighter text-gray-900 dark:text-white uppercase leading-tight">
+              <h1 className="text-5xl font-black tracking-tighter text-white uppercase leading-tight">
                 Tu Álbum Digital <br/> del <span className="text-blue-600">Mundial</span>
               </h1>
-              <p className="text-lg text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+              <p className="text-lg text-gray-400 max-w-md mx-auto">
                 Gestiona tus fichas, evita repetidas e intercambia con amigos en tiempo real.
               </p>
             </div>
@@ -475,11 +475,11 @@ export default function App() {
       
       <main className="max-w-5xl mx-auto px-4 pt-8">
         {/* Dashboard Progress */}
-        <div className="bg-white dark:bg-gray-900 rounded-[32px] p-6 mb-8 border border-gray-100 dark:border-white/5 shadow-xl">
+        <div className="bg-gray-900 rounded-[32px] p-6 mb-8 border border-white/5 shadow-2xl">
            <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="relative w-32 h-32 flex-shrink-0">
                  <svg className="w-full h-full -rotate-90">
-                    <circle cx="64" cy="64" r="58" className="stroke-gray-100 dark:stroke-white/5 fill-none" strokeWidth="10" />
+                    <circle cx="64" cy="64" r="58" className="stroke-white/5 fill-none" strokeWidth="10" />
                     <motion.circle 
                       cx="64" cy="64" r="58" 
                       className="stroke-blue-600 fill-none" 
@@ -491,7 +491,7 @@ export default function App() {
                     />
                  </svg>
                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-black text-gray-900 dark:text-white">{stats.percent}%</span>
+                    <span className="text-2xl font-black text-white">{stats.percent}%</span>
                     <span className="text-[10px] font-bold text-gray-400 uppercase">Proporción</span>
                  </div>
               </div>
@@ -499,7 +499,7 @@ export default function App() {
               <div className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 w-full">
                  <button onClick={() => setActiveTab('album')} className="text-left hover:opacity-70 transition-opacity">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Obtenidas</span>
-                    <p className="text-2xl font-black text-gray-900 dark:text-white">{stats.owned} <span className="text-sm font-medium text-gray-400">/ {stats.totalTotal}</span></p>
+                    <p className="text-2xl font-black text-white">{stats.owned} <span className="text-sm font-medium text-gray-500">/ {stats.totalTotal}</span></p>
                  </button>
                  <button onClick={() => setActiveTab('summary')} className="text-left hover:opacity-70 transition-opacity">
                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Faltan</span>
@@ -512,11 +512,11 @@ export default function App() {
               </div>
 
               <div className="flex flex-col gap-2 w-full md:w-auto">
-                 <div className="bg-gray-100 dark:bg-white/5 p-4 rounded-2xl flex flex-col items-center gap-1 min-w-[140px]">
+                 <div className="bg-white/5 p-4 rounded-2xl flex flex-col items-center gap-1 min-w-[140px]">
                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Mi ID de Álbum</span>
                    <div className="flex items-center gap-2">
-                     <span className="text-xl font-black text-blue-600 dark:text-blue-400 tracking-widest">{shortId || '...'}</span>
-                     <button title="Copiar ID" onClick={shareAlbum} className="p-1 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                     <span className="text-xl font-black text-blue-400 tracking-widest">{shortId || '...'}</span>
+                     <button title="Copiar ID" onClick={shareAlbum} className="p-1 hover:text-blue-400 transition-colors text-white/50 hover:text-white">
                        <Copy className="w-3.5 h-3.5" />
                      </button>
                    </div>
@@ -565,11 +565,11 @@ export default function App() {
               exit={{ height: 0, opacity: 0 }}
               className="overflow-hidden mb-8"
             >
-              <div className="bg-blue-600/5 dark:bg-blue-600/[0.03] border border-blue-600/10 dark:border-blue-600/5 p-6 rounded-[32px] space-y-6">
+              <div className="bg-blue-600/10 border border-blue-600/20 p-6 rounded-[32px] space-y-6">
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <div className="flex-shrink-0">
-                     <h3 className="font-black uppercase text-sm tracking-widest text-blue-600 dark:text-blue-400 mb-1">Comparar con Amigo</h3>
-                     <p className="text-[10px] text-blue-600/60 dark:text-blue-400/60 font-bold uppercase tracking-widest">Ingresa su ID de 8 caracteres</p>
+                     <h3 className="font-black uppercase text-sm tracking-widest text-blue-400 mb-1">Comparar con Amigo</h3>
+                     <p className="text-[10px] text-blue-400/60 font-bold uppercase tracking-widest">Ingresa su ID de 8 caracteres</p>
                   </div>
                   <div className="flex-1 flex gap-2 w-full">
                     <input 
@@ -577,7 +577,7 @@ export default function App() {
                       placeholder="EJ: ABCD1234"
                       value={compareInput}
                       onChange={(e) => setCompareInput(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white dark:bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl px-4 py-3 outline-none font-black tracking-widest uppercase text-lg shadow-sm"
+                      className="flex-1 bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl px-4 py-3 outline-none font-black tracking-widest uppercase text-lg shadow-sm text-white"
                     />
                     <button 
                       onClick={() => lookupByShortId()}
@@ -595,7 +595,7 @@ export default function App() {
                     <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Amigos Recientes</h4>
                     <div className="flex flex-wrap gap-2">
                        {Object.entries(friends).sort((a,b) => b[1].lastInteraction - a[1].lastInteraction).map(([fId, info]) => (
-                         <div key={fId} className="flex items-center bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl pr-1 overflow-hidden transition-all hover:border-blue-600/30 group">
+                         <div key={fId} className="flex items-center bg-white/5 border border-white/5 rounded-xl pr-1 overflow-hidden transition-all hover:border-blue-600/30 group">
                            <button 
                              onClick={() => lookupByShortId(fId)}
                              className="flex items-center gap-2 py-2 px-3 text-left"
