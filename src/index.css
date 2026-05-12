@@ -4,19 +4,29 @@
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Enable class-based dark mode for Tailwind v4 */
-@variant dark (&:where(.dark, .dark *));
+/* Redefine dark variant to use the .dark class specifically. 
+   Using (.dark &) ensures any element inside a .dark ancestor respects the variant. */
+@variant dark (.dark &);
 
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
   }
   
+  html.dark {
+    color-scheme: dark;
+  }
+  
+  html.light {
+    color-scheme: light;
+  }
+
   body {
     @apply bg-gray-50 text-gray-900 transition-colors duration-300;
   }
 
-  .dark body {
+  /* Force background sync for body when class is on html */
+  html.dark body {
     @apply bg-[#050505] text-gray-100;
   }
 }

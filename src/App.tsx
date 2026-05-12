@@ -31,6 +31,7 @@ export default function App() {
   
   const [compareData, setCompareData] = useState<{ userId: string; name: string; stickers: Record<string, number>; shortId: string } | null>(null);
   const [isComparing, setIsComparing] = useState(false);
+  const [isViewingFriendAlbum, setIsViewingFriendAlbum] = useState(false);
   const [tradeProposal, setTradeProposal] = useState<{ give: string[], get: string[] }>({ give: [], get: [] });
   const [incomingProposals, setIncomingProposals] = useState<TradeProposal[]>([]);
   const [outgoingProposals, setOutgoingProposals] = useState<TradeProposal[]>([]);
@@ -82,6 +83,11 @@ export default function App() {
     };
   }, [user]);
 
+  const activeStickers = useMemo(() => {
+    if (isViewingFriendAlbum && compareData) return compareData.stickers;
+    return stickers;
+  }, [isViewingFriendAlbum, compareData, stickers]);
+
   const groups = useMemo(() => {
     const map: Record<string, typeof TEAMS> = {};
     TEAMS.forEach(team => {
@@ -94,7 +100,7 @@ export default function App() {
       const total = gTeams.length * 20;
       gTeams.forEach(t => {
         for(let i=1; i<=20; i++) {
-          if ((stickers[`${t.id}-${i}`] || 0) > 0) owned++;
+          if ((activeStickers[`${t.id}-${i}`] || 0) > 0) owned++;
         }
       });
       return { 
@@ -105,14 +111,14 @@ export default function App() {
         percent: Math.round((owned / total) * 100)
       };
     });
-  }, [stickers]);
+  }, [activeStickers]);
 
   const missingStickers = useMemo(() => {
     const missing: { id: string; name: string; stickers: number[] }[] = [];
     
     TEAMS.forEach(team => {
       const teamMissing = Array.from({ length: 20 }, (_, i) => i + 1)
-        .filter(n => (stickers[`${team.id}-${n}`] || 0) === 0);
+        .filter(n => (activeStickers[`${team.id}-${n}`] || 0) === 0);
       if (teamMissing.length > 0) {
         missing.push({ id: team.id, name: team.name, stickers: teamMissing });
       }
@@ -120,21 +126,21 @@ export default function App() {
 
     Object.entries(SPECIALS).forEach(([key, info]) => {
       const specialMissing = Array.from({ length: info.count }, (_, i) => i + 1)
-        .filter(n => (stickers[`${key}-${n}`] || 0) === 0);
+        .filter(n => (activeStickers[`${key}-${n}`] || 0) === 0);
       if (specialMissing.length > 0) {
         missing.push({ id: key, name: info.name, stickers: specialMissing });
       }
     });
 
     return missing;
-  }, [stickers]);
+  }, [activeStickers]);
 
   const repeatedStickers = useMemo(() => {
     const repeated: { id: string; name: string; stickers: { num: number; count: number }[] }[] = [];
     
     TEAMS.forEach(team => {
       const teamRepeated = Array.from({ length: 20 }, (_, i) => i + 1)
-        .map(n => ({ num: n, count: stickers[`${team.id}-${n}`] || 0 }))
+        .map(n => ({ num: n, count: activeStickers[`${team.id}-${n}`] || 0 }))
         .filter(s => s.count > 1);
       if (teamRepeated.length > 0) {
         repeated.push({ id: team.id, name: team.name, stickers: teamRepeated });
@@ -143,7 +149,7 @@ export default function App() {
 
     Object.entries(SPECIALS).forEach(([key, info]) => {
       const specialRepeated = Array.from({ length: info.count }, (_, i) => i + 1)
-        .map(n => ({ num: n, count: stickers[`${key}-${n}`] || 0 }))
+        .map(n => ({ num: n, count: activeStickers[`${key}-${n}`] || 0 }))
         .filter(s => s.count > 1);
       if (specialRepeated.length > 0) {
         repeated.push({ id: key, name: info.name, stickers: specialRepeated });
@@ -151,7 +157,31 @@ export default function App() {
     });
 
     return repeated;
-  }, [stickers]);
+  }, [activeStickers]);
+
+  const multiRepeatedStickers = useMemo(() => {
+    const multi: { id: string; name: string; stickers: { num: number; count: number }[] }[] = [];
+    
+    TEAMS.forEach(team => {
+      const teamMulti = Array.from({ length: 20 }, (_, i) => i + 1)
+        .map(n => ({ num: n, count: activeStickers[`${team.id}-${n}`] || 0 }))
+        .filter(s => s.count > 2);
+      if (teamMulti.length > 0) {
+        multi.push({ id: team.id, name: team.name, stickers: teamMulti });
+      }
+    });
+
+    Object.entries(SPECIALS).forEach(([key, info]) => {
+      const specialMulti = Array.from({ length: info.count }, (_, i) => i + 1)
+        .map(n => ({ num: n, count: activeStickers[`${key}-${n}`] || 0 }))
+        .filter(s => s.count > 2);
+      if (specialMulti.length > 0) {
+        multi.push({ id: key, name: info.name, stickers: specialMulti });
+      }
+    });
+
+    return multi;
+  }, [activeStickers]);
 
   const comparisonDeal = useMemo(() => {
     if (!compareData) return null;
@@ -235,13 +265,17 @@ export default function App() {
     
     let owned = 0;
     let repeated = 0;
-    Object.values(stickers).forEach(count => {
+    let multiRepeated = 0;
+    Object.values(activeStickers).forEach(count => {
       if (count > 0) owned++;
-      if (count > 1) repeated += (count - 1);
+      if (count > 1) {
+        repeated += (count - 1);
+        if (count > 2) multiRepeated += (count - 2);
+      }
     });
 
-    return { totalTotal, owned, repeated, missing: totalTotal - owned, percent: Math.round((owned / totalTotal) * 100) };
-  }, [stickers]);
+    return { totalTotal, owned, repeated, multiRepeated, missing: totalTotal - owned, percent: Math.round((owned / totalTotal) * 100) };
+  }, [activeStickers]);
 
   const editNickname = (fId: string, current: string) => {
     const name = prompt('Asignar apodo para este álbum:', current);
@@ -430,6 +464,15 @@ export default function App() {
     alert('Lista de repetidas copiada al portapapeles');
   };
 
+  const copyMultiRepeatedList = () => {
+    let text = "MI ALBUM - MULTI-REPETIDAS (+2):\n\n";
+    multiRepeatedStickers.forEach(team => {
+      text += `${team.id}: ${team.stickers.map(s => s.num).sort((a,b)=>a-b).join(', ')}\n`;
+    });
+    navigator.clipboard.writeText(text);
+    alert('Lista de multi-repetidas copiada al portapapeles');
+  };
+
   if (authLoading) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-[#050505] transition-colors duration-300">
       <Trophy className="w-12 h-12 text-blue-500 animate-bounce mb-4" />
@@ -474,6 +517,37 @@ export default function App() {
       <Navbar />
       
       <main className="max-w-5xl mx-auto px-4 pt-8">
+        {/* Friend Album View Banner */}
+        <AnimatePresence>
+          {isViewingFriendAlbum && compareData && (
+            <motion.div 
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="mb-8"
+            >
+              <div className="bg-amber-500 text-white px-6 py-4 rounded-[28px] shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-2xl">
+                    👀
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Modo Observador</p>
+                    <h3 className="text-xl font-black uppercase tracking-tighter">Álbum de {compareData.name}</h3>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsViewingFriendAlbum(false)}
+                  className="bg-white text-amber-600 px-6 py-2 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-lg hover:bg-gray-100 transition-all flex items-center gap-2"
+                >
+                  <ArrowLeftRight className="w-3.5 h-3.5" />
+                  Volver a Mi Álbum
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Dashboard Progress */}
         <div className="bg-white dark:bg-gray-900 rounded-[32px] p-6 mb-8 border border-gray-100 dark:border-white/5 shadow-2xl">
            <div className="flex flex-col md:flex-row items-center gap-8">
@@ -571,51 +645,85 @@ export default function App() {
                      <h3 className="font-black uppercase text-sm tracking-widest text-blue-600 dark:text-blue-400 mb-1">Comparar con Amigo</h3>
                      <p className="text-[10px] text-blue-500/60 dark:text-blue-400/60 font-bold uppercase tracking-widest">Ingresa su ID de 8 caracteres</p>
                   </div>
-                  <div className="flex-1 flex gap-2 w-full">
-                    <input 
-                      type="text" 
-                      placeholder="EJ: ABCD1234"
-                      value={compareInput}
-                      onChange={(e) => setCompareInput(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white/10 dark:bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl px-4 py-3 outline-none font-black tracking-widest uppercase text-lg shadow-sm text-gray-900 dark:text-white"
-                    />
-                    <button 
-                      onClick={() => lookupByShortId()}
-                      disabled={isSearchingId || !compareInput}
-                      className="bg-blue-600 text-white px-6 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center gap-2 border-b-4 border-blue-800 active:border-b-0 active:translate-y-1"
-                    >
-                      {isSearchingId ? '...' : 'Comparar'}
-                      <ArrowLeftRight className="w-4 h-4" />
-                    </button>
-                  </div>
+                    <div className="flex-1 flex flex-col sm:flex-row gap-2 w-full">
+                      <input 
+                        type="text" 
+                        placeholder="EJ: ABCD1234"
+                        value={compareInput}
+                        onChange={(e) => setCompareInput(e.target.value.toUpperCase())}
+                        className="flex-1 bg-white/10 dark:bg-white/5 border border-transparent focus:border-blue-500 rounded-2xl px-4 py-3 outline-none font-black tracking-widest uppercase text-lg shadow-sm text-gray-900 dark:text-white"
+                      />
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => lookupByShortId()}
+                          disabled={isSearchingId || !compareInput}
+                          className="flex-1 sm:flex-none bg-blue-600 text-white px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-700 disabled:opacity-50 transition-all flex items-center justify-center gap-2 border-b-4 border-blue-800 active:border-b-0 active:translate-y-1 shadow-lg shadow-blue-500/20"
+                        >
+                          {isSearchingId ? '...' : 'Comparar'}
+                          <ArrowLeftRight className="w-4 h-4" />
+                        </button>
+                        {compareData && (
+                          <button 
+                            onClick={() => {
+                              setIsViewingFriendAlbum(true);
+                              setIsComparing(false);
+                            }}
+                            className="flex-1 sm:flex-none bg-amber-500 text-white px-6 py-3 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-amber-600 transition-all flex items-center justify-center gap-2 border-b-4 border-amber-700 active:border-b-0 active:translate-y-1 shadow-lg shadow-amber-500/20"
+                          >
+                            Ver Álbum <Trophy className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                 </div>
 
                 {Object.keys(friends).length > 0 && (
                   <div className="space-y-3">
                     <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Amigos Recientes</h4>
-                    <div className="flex flex-wrap gap-2">
-                       {Object.entries(friends).sort((a,b) => b[1].lastInteraction - a[1].lastInteraction).map(([fId, info]) => (
-                         <div key={fId} className="flex items-center bg-white/5 border border-white/5 rounded-xl pr-1 overflow-hidden transition-all hover:border-blue-600/30 group">
-                           <button 
-                             onClick={() => lookupByShortId(fId)}
-                             className="flex items-center gap-2 py-2 px-3 text-left"
-                           >
-                             <div className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-[10px] font-black text-blue-600">{fId.substring(0,2)}</div>
-                             <div>
-                               <p className="text-[10px] font-black uppercase tracking-tighter leading-none mb-0.5">{info.nickname}</p>
-                               <p className="text-[8px] font-bold text-gray-400 tracking-widest leading-none">{fId}</p>
+                        <div className="flex flex-wrap gap-2">
+                           {Object.entries(friends).sort((a,b) => b[1].lastInteraction - a[1].lastInteraction).map(([fId, info]) => (
+                             <div key={fId} className="flex flex-col bg-white/5 border border-white/5 rounded-2xl overflow-hidden transition-all hover:border-blue-600/30 group">
+                               <div className="flex items-center">
+                                 <button 
+                                   onClick={() => lookupByShortId(fId)}
+                                   className="flex items-center gap-2 py-2 px-3 text-left flex-1"
+                                 >
+                                   <div className="w-8 h-8 rounded-lg bg-blue-600/10 flex items-center justify-center text-[10px] font-black text-blue-600">{fId.substring(0,2)}</div>
+                                   <div>
+                                     <p className="text-[10px] font-black uppercase tracking-tighter leading-none mb-0.5">{info.nickname}</p>
+                                     <p className="text-[8px] font-bold text-gray-400 tracking-widest leading-none">{fId}</p>
+                                   </div>
+                                 </button>
+                                 <button 
+                                   onClick={() => editNickname(fId, info.nickname)}
+                                   className="p-3 text-gray-300 hover:text-blue-600 transition-colors"
+                                   title="Editar apodo"
+                                 >
+                                   <Pencil className="w-3.5 h-3.5" /> 
+                                 </button>
+                               </div>
+                               <button 
+                                 onClick={async () => {
+                                   const fDoc = await getDoc(doc(db, 'albums', fId));
+                                   if (fDoc.exists()) {
+                                     setCompareData({
+                                       userId: fId,
+                                       name: info.nickname || 'Amigo',
+                                       stickers: fDoc.data().stickers || {},
+                                       shortId: fId
+                                     });
+                                     setIsViewingFriendAlbum(true);
+                                     setIsComparing(false);
+                                     setShowSearchPanel(false);
+                                   }
+                                 }}
+                                 className="bg-amber-500/10 text-amber-600 py-1.5 text-[8px] font-black uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-all"
+                               >
+                                 Ver Álbum Completo
+                               </button>
                              </div>
-                           </button>
-                           <button 
-                             onClick={() => editNickname(fId, info.nickname)}
-                             className="p-2 text-gray-300 hover:text-blue-600 transition-colors"
-                             title="Editar apodo"
-                           >
-                             <Pencil className="w-3.5 h-3.5" /> 
-                           </button>
-                         </div>
-                       ))}
-                    </div>
+                           ))}
+                        </div>
                   </div>
                 )}
               </div>
@@ -801,8 +909,8 @@ export default function App() {
                           >
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-1">
                               {group.teams.map(team => {
-                                const owned = Array.from({length:20}, (_,i)=>i+1).filter(n => (stickers[`${team.id}-${n}`]||0)>0).length;
-                                return <TeamCard key={team.id} team={team} ownedCount={owned} onClick={()=>setSelectedTeam(team.id)} isComparing={isComparing} compareData={compareData} myStickers={stickers} />;
+                                const owned = Array.from({length:20}, (_,i)=>i+1).filter(n => (activeStickers[`${team.id}-${n}`]||0)>0).length;
+                                return <TeamCard key={team.id} team={team} ownedCount={owned} onClick={()=>setSelectedTeam(team.id)} isComparing={isComparing} compareData={compareData} myStickers={stickers} isViewingFriendAlbum={isViewingFriendAlbum} />;
                               })}
                             </div>
                           </motion.div>
@@ -813,8 +921,8 @@ export default function App() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {filteredTeams.map(team => {
-                      const owned = Array.from({length:20}, (_,i)=>i+1).filter(n => (stickers[`${team.id}-${n}`]||0)>0).length;
-                      return <TeamCard key={team.id} team={team} ownedCount={owned} onClick={()=>setSelectedTeam(team.id)} isComparing={isComparing} compareData={compareData} myStickers={stickers} />;
+                      const owned = Array.from({length:20}, (_,i)=>i+1).filter(n => (activeStickers[`${team.id}-${n}`]||0)>0).length;
+                      return <TeamCard key={team.id} team={team} ownedCount={owned} onClick={()=>setSelectedTeam(team.id)} isComparing={isComparing} compareData={compareData} myStickers={stickers} isViewingFriendAlbum={isViewingFriendAlbum} />;
                     })}
                   </div>
                 )}
@@ -828,7 +936,7 @@ export default function App() {
                 className="col-span-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
               >
                 {Object.entries(SPECIALS).map(([key, info]) => {
-                  const owned = Object.keys(stickers).filter(id => id.startsWith(key)).filter(id => stickers[id]>0).length;
+                  const owned = Object.keys(activeStickers).filter(id => id.startsWith(key)).filter(id => activeStickers[id]>0).length;
                   return <button key={key} onClick={()=>setSelectedTeam(key)} className="bg-white dark:bg-gray-900 p-6 rounded-[28px] border border-gray-100 dark:border-white/5 shadow-lg text-left hover:border-blue-500 transition-all group">
                      <div className="flex items-center justify-between mb-4">
                         <div className={cn(
@@ -1051,11 +1159,20 @@ export default function App() {
                               </div>
                             </div>
                           </div>
-                          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                             <button 
-                               onClick={sendInAppProposal}
-                               className="flex-1 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-700 shadow-xl shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-                             >
+                             <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                              <button 
+                                onClick={() => {
+                                  setIsViewingFriendAlbum(true);
+                                  setIsComparing(false); // Hide comparison bar when viewing full album
+                                }}
+                                className="flex-1 bg-amber-500 text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-amber-600 shadow-xl shadow-amber-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                              >
+                                Ver Álbum de {compareData.name} <Trophy className="w-4 h-4" />
+                              </button>
+                              <button 
+                                onClick={sendInAppProposal}
+                                className="flex-1 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-blue-700 shadow-xl shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                              >
                                Enviar Propuesta <Users className="w-4 h-4" />
                              </button>
                              <button 
@@ -1282,6 +1399,84 @@ export default function App() {
                            )}
                         </div>
                      </div>
+
+                     {/* Multi-Repeated List (+2) */}
+                     <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                           <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-2">
+                              <div className="w-1.5 h-6 bg-red-600 rounded-full" />
+                              Multi-Repetidas ({stats.multiRepeated})
+                           </h3>
+                           <button 
+                             onClick={copyMultiRepeatedList}
+                             className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-white/5 hover:bg-red-600/10 dark:hover:bg-red-600/20 hover:text-red-600 dark:hover:text-red-500 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest text-gray-500"
+                           >
+                             <Copy className="w-3 h-3" />
+                             Copiar Texto
+                           </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar content-start">
+                           {multiRepeatedStickers.length > 0 ? multiRepeatedStickers.map(item => {
+                             const isExpanded = expandedSummaryGroups[`multi-${item.id}`];
+                             return (
+                               <div key={item.id} className={cn("transition-all duration-300", isExpanded ? "w-full" : "w-auto")}>
+                                 <button 
+                                   onClick={() => toggleSummaryGroup(`multi-${item.id}`)}
+                                   className={cn(
+                                     "px-4 h-10 rounded-full flex items-center gap-2 border transition-all font-black text-xs uppercase tracking-widest",
+                                     isExpanded 
+                                       ? "bg-red-600 border-red-600 text-white w-full" 
+                                       : "bg-white dark:bg-gray-900 border-gray-200 dark:border-white/10 text-gray-400 hover:border-red-600/50 shadow-sm"
+                                   )}
+                                 >
+                                   <span>{item.id}</span>
+                                   {isExpanded && <span className="opacity-80 font-bold ml-1 flex-1 text-left line-clamp-1">{item.name}</span>}
+                                   <div className={cn("w-5 h-5 rounded-full flex items-center justify-center text-[10px]", isExpanded ? "bg-white/20" : "bg-gray-200 dark:bg-white/5")}>
+                                     {item.stickers.length}
+                                   </div>
+                                 </button>
+                                 <AnimatePresence>
+                                   {isExpanded && (
+                                     <motion.div 
+                                       initial={{ height: 0, opacity: 0 }}
+                                       animate={{ height: 'auto', opacity: 1 }}
+                                       exit={{ height: 0, opacity: 0 }}
+                                       className="overflow-hidden"
+                                     >
+                                       <div className="p-4 mt-2 bg-gray-50 dark:bg-white/5 rounded-3xl border border-gray-200 dark:border-white/5">
+                                          <div className="flex flex-wrap gap-3">
+                                            {item.stickers.map(s => {
+                                              const playerName = PLAYER_NAMES[item.id]?.[s.num];
+                                              return (
+                                                <button 
+                                                 key={s.num}
+                                                 onClick={() => setSelectedTeam(item.id)}
+                                                 className="relative h-14 min-w-[60px] px-2 flex flex-col items-center justify-center bg-white dark:bg-gray-900 text-red-600 dark:text-red-400 rounded-2xl font-black border border-gray-100 dark:border-white/5 shadow-sm hover:border-red-600/50 transition-all active:scale-95"
+                                                >
+                                                  <span className={cn(playerName ? "text-[11px]" : "text-sm")}>{s.num}</span>
+                                                  {playerName && (
+                                                    <span className="text-[8px] leading-tight uppercase font-bold text-center opacity-70 truncate w-full mt-0.5">
+                                                      {playerName}
+                                                    </span>
+                                                  )}
+                                                  <span className="absolute -top-2 -right-1 bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded-full font-black shadow-lg">x{s.count - 1}</span>
+                                                </button>
+                                              );
+                                            })}
+                                          </div>
+                                       </div>
+                                     </motion.div>
+                                   )}
+                                 </AnimatePresence>
+                               </div>
+                             );
+                           }) : (
+                             <div className="w-full text-center py-12 text-gray-400 italic text-sm">
+                                No tienes fichas repetidas más de una vez.
+                             </div>
+                           )}
+                        </div>
+                     </div>
                   </div>
                </motion.div>
             )}
@@ -1289,7 +1484,7 @@ export default function App() {
         </div>
       </main>
 
-      <AnimatePresence>{selectedTeam && <TeamDetail teamId={selectedTeam} onClose={()=>setSelectedTeam(null)} compareData={isComparing?compareData:null} />}</AnimatePresence>
+      <AnimatePresence>{selectedTeam && <TeamDetail teamId={selectedTeam} onClose={()=>setSelectedTeam(null)} compareData={isComparing || isViewingFriendAlbum ? compareData : null} isFriendView={isViewingFriendAlbum} />}</AnimatePresence>
       
       {/* Mobile Nav */}
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 sm:hidden">
@@ -1303,13 +1498,14 @@ export default function App() {
   );
 }
 
-function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStickers }: { 
+function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStickers, isViewingFriendAlbum }: { 
   team: typeof TEAMS[0]; 
   ownedCount: number; 
   onClick: () => void; 
   isComparing: boolean; 
   compareData: { userId: string; name: string; stickers: Record<string, number>; shortId: string } | null; 
-  myStickers: Record<string, number> 
+  myStickers: Record<string, number>;
+  isViewingFriendAlbum: boolean;
 }) {
   const progress = (ownedCount/20)*100;
   const colors = COUNTRY_COLORS[team.id] || { primary: '#2563eb', secondary: '#ffffff', text: '#ffffff' };
@@ -1350,6 +1546,7 @@ function TeamCard({ team, ownedCount, onClick, isComparing, compareData, myStick
       </div>
       
       {isComparing && compareData && <div className="relative z-10"><ComparisonBadge teamId={team.id} myStickers={myStickers} theirStickers={compareData.stickers} count={20} /></div>}
+      {isViewingFriendAlbum && <div className="absolute inset-0 bg-amber-500/5 pointer-events-none" />}
     </motion.button>
   );
 }
@@ -1374,15 +1571,18 @@ function ComparisonBadge({ teamId, myStickers, theirStickers, count }: {
   );
 }
 
-function TeamDetail({ teamId, onClose, compareData }: { 
+function TeamDetail({ teamId, onClose, compareData, isFriendView }: { 
   teamId: string; 
   onClose: () => void; 
-  compareData: { userId: string; name: string; stickers: Record<string, number>; shortId: string } | null 
+  compareData: { userId: string; name: string; stickers: Record<string, number>; shortId: string } | null;
+  isFriendView?: boolean;
 }) {
   const { stickers, updateSticker } = useAlbum();
   const team = TEAMS.find(t => t.id === teamId) || (SPECIALS as Record<string, { name: string; count: number; flag?: string }>)[teamId];
   const count = team.count || 20;
   const colors = COUNTRY_COLORS[teamId] || { primary: '#2563eb', secondary: '#ffffff', text: '#ffffff' };
+
+  const effectiveStickers = isFriendView && compareData ? compareData.stickers : stickers;
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -1411,7 +1611,9 @@ function TeamDetail({ teamId, onClose, compareData }: {
                  <div className="flex items-center gap-3">
                    <p className="text-gray-500 dark:text-gray-400 text-xs font-black uppercase tracking-widest">{count} fichas totales</p>
                    <span className="h-1 w-1 rounded-full bg-gray-300 dark:bg-gray-600" />
-                   <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-black">MANTÉN PARA QUITAR</span>
+                   <span className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-black">
+                     {isFriendView ? 'MODO LECTURA' : 'MANTÉN PARA QUITAR'}
+                   </span>
                  </div>
                </div>
             </div>
@@ -1441,24 +1643,43 @@ function TeamDetail({ teamId, onClose, compareData }: {
 
           <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-x-3 gap-y-6 pb-12">
             {Array.from({ length: count }, (_, i) => i + 1).map(num => {
-              const sId = `${teamId}-${num}`; const my = stickers[sId] || 0; const their = compareData?.stickers[sId] || 0;
+              const sId = `${teamId}-${num}`; const my = effectiveStickers[sId] || 0; const their = isFriendView ? stickers[sId] : (compareData?.stickers[sId] || 0);
               const isSpecial = (teamId === '00' || teamId === 'FWC' || teamId === 'CC') || (num === 1 || num === 13);
               const playerName = PLAYER_NAMES[teamId]?.[num];
-              let ring = ""; if (compareData) { if (my === 0 && their > 1) ring = "ring-4 ring-green-500 ring-offset-4 dark:ring-offset-gray-950"; if (their === 0 && my > 1) ring = "ring-4 ring-amber-500 ring-offset-4 dark:ring-offset-gray-950"; }
+              
+              // Highlight logic for comparisons
+              let ring = ""; 
+              if (compareData) {
+                const myCount = stickers[sId] || 0;
+                const friendCount = compareData.stickers[sId] || 0;
+                
+                // Verde (Green): I lack it and friend has it repeated (can give it to me)
+                if (myCount === 0 && friendCount > 1) {
+                  ring = "ring-4 ring-green-500 ring-offset-4 dark:ring-offset-gray-950";
+                }
+                // Naranja (Orange): Friend lacks it and I have it repeated (can give it to him)
+                else if (friendCount === 0 && myCount > 1) {
+                  ring = "ring-4 ring-amber-500 ring-offset-4 dark:ring-offset-gray-950";
+                }
+              }
+
               return (
                 <div key={sId} className="relative">
                    <StickerButton 
                      id={sId} 
                      label={teamId === '00' ? '00' : (teamId === 'FWC' || teamId === 'CC') ? `${teamId}${num}` : `${num}`} 
                      count={my} 
-                     onClick={() => updateSticker(sId, 1)} 
-                     onLongPress={() => updateSticker(sId, -1)} 
+                     onClick={() => !isFriendView && updateSticker(sId, 1)} 
+                     onLongPress={() => !isFriendView && updateSticker(sId, -1)} 
                      className={ring}
                      isSpecial={isSpecial}
                      playerName={playerName}
                    />
-                   {compareData && their > 0 && (
-                     <div className="absolute -top-1.5 -left-1.5 flex h-5 w-5 rounded-full bg-green-500 border-2 border-white dark:border-gray-950 z-20 shadow-sm flex items-center justify-center">
+                   {((!isFriendView && compareData && their > 0) || (isFriendView && their > 0)) && (
+                     <div className={cn(
+                       "absolute -top-1.5 -left-1.5 flex h-5 w-5 rounded-full border-2 border-white dark:border-gray-950 z-20 shadow-sm flex items-center justify-center",
+                       isFriendView ? "bg-blue-600" : "bg-green-500"
+                     )}>
                         <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
                      </div>
                    )}
